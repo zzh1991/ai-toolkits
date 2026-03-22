@@ -1,7 +1,8 @@
-// src/routes/home/HomePage.tsx
+// src/routes/reminder/ReminderPage.tsx
 import { useState, useEffect, useCallback } from 'react';
+import { Link } from 'react-router';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus } from 'lucide-react';
+import { Plus, ArrowLeft } from 'lucide-react';
 import { useReminderStore } from '@/modules/reminder/stores/reminderStore';
 import ReminderList from '@/modules/reminder/components/ReminderList';
 import ReminderForm from '@/modules/reminder/components/ReminderForm';
@@ -9,7 +10,7 @@ import { Button } from '@/shared/components/ui/button';
 import type { Reminder } from '@/db/schema';
 import type { ReminderFormData } from '@/modules/reminder/types/reminder';
 
-export default function HomePage() {
+export default function ReminderPage() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingReminder, setEditingReminder] = useState<Reminder | undefined>(undefined);
 
@@ -43,11 +44,9 @@ export default function HomePage() {
   }, [deleteReminder]);
 
   const handleSubmit = useCallback((data: ReminderFormData) => {
-    // 立即关闭表单，使用乐观更新
     setIsFormOpen(false);
     setEditingReminder(undefined);
 
-    // 后台执行数据操作
     if (editingReminder?.id) {
       updateReminder(editingReminder.id, data);
     } else {
@@ -80,9 +79,20 @@ export default function HomePage() {
           transition={{ duration: 0.3 }}
           className="flex items-center justify-between mb-6 sm:mb-10 gap-4"
         >
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">倒数日</h1>
-            <p className="text-white/50 mt-1 text-sm sm:text-base">记录每一个重要的日子</p>
+          <div className="flex items-center gap-3">
+            <Link to="/">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-white/70 hover:text-white hover:bg-white/10"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </Button>
+            </Link>
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">倒数日</h1>
+              <p className="text-white/50 mt-1 text-sm sm:text-base">记录每一个重要的日子</p>
+            </div>
           </div>
           <Button
             onClick={handleAdd}
