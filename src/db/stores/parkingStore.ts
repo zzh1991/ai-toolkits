@@ -23,11 +23,17 @@ export async function startParking(): Promise<number> {
     await endParking(active.id!);
   }
 
-  return db.parkingRecords.add({
+  const id = await db.parkingRecords.add({
     startTime: new Date(),
     isActive: true,
     createdAt: new Date(),
   });
+
+  if (id === undefined) {
+    throw new Error('Failed to add parking record');
+  }
+
+  return id;
 }
 
 // 结束停车
