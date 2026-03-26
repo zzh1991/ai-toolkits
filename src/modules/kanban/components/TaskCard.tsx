@@ -2,10 +2,19 @@
 import { useState, useCallback } from 'react';
 import { format } from 'date-fns';
 import { zhCN } from 'date-fns/locale';
-import { Calendar, Clock, ChevronDown, ChevronUp, Trash2, Edit2 } from 'lucide-react';
+import {
+  Calendar,
+  CaretDown,
+  CaretUp,
+  Trash,
+  PencilSimple,
+  CheckCircle,
+  Check,
+} from '@phosphor-icons/react';
 import { Checkbox } from '@/shared/components/ui/checkbox';
 import { Button } from '@/shared/components/ui/button';
 import type { Task } from '@/db/schema';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface TaskCardProps {
   task: Task;
@@ -44,117 +53,140 @@ export default function TaskCard({
     return format(new Date(date), 'yyyy-MM-dd HH:mm', { locale: zhCN });
   };
 
+  const isOverdue = task.deadline && new Date(task.deadline) < new Date() && !task.isCompleted;
+
   return (
-    <div
-      className={`group relative rounded-lg border bg-white dark:bg-gray-900 p-3 transition-all hover:shadow-md ${
-        isCompleted ? 'opacity-75' : ''
+    <motion.div
+      layout
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -8 }}
+      className={`group relative rounded-xl border transition-all duration-300 ${
+        isCompleted
+          ? 'bg-white/[0.02] border-white/[0.04] opacity-50'
+          : 'bg-[#1a1a1c] border-white/[0.06] hover:border-white/[0.1] hover:shadow-lg hover:shadow-black/20'
       }`}
     >
-      <div className="flex items-start gap-3">
-        <Checkbox
-          checked={task.isCompleted}
-          onCheckedChange={handleToggle}
-          className="mt-1"
-        />
-        <div className="flex-1 min-w-0">
-          <div className="flex items-start justify-between gap-2">
-            <h4
-              className={`text-sm font-medium leading-tight text-gray-900 dark:text-gray-100 ${
-                isCompleted ? 'line-through text-gray-400 dark:text-gray-500' : ''
-              }`}
-            >
-              {task.title}
-            </h4>
-            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-6 w-6 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
-                onClick={handleEdit}
+      <div className="p-3.5">
+        <div className="flex items-start gap-3">
+          <Checkbox
+            checked={task.isCompleted}
+            onCheckedChange={handleToggle}
+            className={`mt-0.5 border-white/20 data-[state=checked]:bg-emerald-500 data-[state=checked]:border-emerald-500 transition-all duration-200`}
+          />
+          <div className="flex-1 min-w-0">
+            <div className="flex items-start justify-between gap-2">
+              <h4
+                className={`text-sm font-medium leading-tight transition-all ${
+                  isCompleted ? 'line-through text-white/30' : 'text-white/80'
+                }`}
               >
-                <Edit2 className="h-3 w-3" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-6 w-6 text-red-400 hover:text-red-600 dark:text-red-500 dark:hover:text-red-400"
-                onClick={handleDelete}
-              >
-                <Trash2 className="h-3 w-3" />
-              </Button>
+                {task.title}
+              </h4>
+              <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7 rounded-lg text-white/30 hover:text-white hover:bg-white/[0.05]"
+                  onClick={handleEdit}
+                >
+                  <PencilSimple weight="bold" className="h-3.5 w-3.5" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7 rounded-lg text-white/30 hover:text-red-400 hover:bg-red-500/10"
+                  onClick={handleDelete}
+                >
+                  <Trash weight="bold" className="h-3.5 w-3.5" />
+                </Button>
+              </div>
             </div>
-          </div>
 
-          {/* Deadline or Completed time */}
-          <div className="flex items-center gap-2 mt-2 text-xs text-gray-500 dark:text-gray-400">
-            {isCompleted ? (
-              <span className="flex items-center gap-1">
-                <Clock className="h-3 w-3" />
-                完成于 {task.completedAt ? formatDate(task.completedAt) : '-'}
-              </span>
-            ) : task.deadline ? (
-              <span className="flex items-center gap-1">
-                <Calendar className="h-3 w-3" />
-                截止 {formatDate(task.deadline)}
-              </span>
-            ) : null}
-          </div>
+            {/* Deadline or Completed time */}
+            <div className="flex items-center gap-2 mt-2 text-xs">
+              {isCompleted ? (
+                <span className="flex items-center gap-1.5 text-white/30">
+                  <CheckCircle weight="fill" className="h-3.5 w-3.5 text-emerald-400/60" />
+                  完成于 {task.completedAt ? formatDate(task.completedAt) : '-'}
+                </span>
+              ) : task.deadline ? (
+                <span
+                  className={`flex items-center gap-1.5 ${isOverdue ? 'text-red-400/80' : 'text-white/40'}`}
+                >
+                  <Calendar weight="bold" className={`h-3.5 w-3.5 ${isOverdue ? 'text-red-400' : ''}`} />
+                  {isOverdue ? '已逾期 ' : '截止 '}
+                  {formatDate(task.deadline)}
+                </span>
+              ) : null}
+            </div>
 
-          {/* Expandable details */}
-          {task.note && (
-            <div className="mt-2">
+            {/* Expandable details */}
+            {task.note && (
+              <div className="mt-3">
+                <button
+                  onClick={() => setShowDetails(!showDetails)}
+                  className="flex items-center gap-1 text-xs text-white/30 hover:text-white/50 transition-colors py-1"
+                >
+                  {showDetails ? (
+                    <>
+                      <CaretUp weight="bold" className="h-3 w-3" />
+                      收起详情
+                    </>
+                  ) : (
+                    <>
+                      <CaretDown weight="bold" className="h-3 w-3" />
+                      查看备注
+                    </>
+                  )}
+                </button>
+                <AnimatePresence>
+                  {showDetails && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="mt-2 text-xs text-white/60 bg-white/[0.03] rounded-lg p-3 border border-white/[0.06]"
+                    >
+                      <p className="whitespace-pre-wrap leading-relaxed">{task.note}</p>
+                      <p className="mt-3 text-white/30">创建于 {formatFullDate(task.createdAt)}</p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            )}
+
+            {/* Show created time if no note */}
+            {!task.note && showDetails && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="mt-2 text-xs text-white/40"
+              >
+                <button
+                  onClick={() => setShowDetails(false)}
+                  className="flex items-center gap-1 hover:text-white/60 transition-colors"
+                >
+                  <CaretUp weight="bold" className="h-3 w-3" />
+                  收起
+                </button>
+                <p className="mt-2 text-white/25">创建于 {formatFullDate(task.createdAt)}</p>
+              </motion.div>
+            )}
+
+            {!task.note && !showDetails && (
               <button
-                onClick={() => setShowDetails(!showDetails)}
-                className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
+                onClick={() => setShowDetails(true)}
+                className="flex items-center gap-1 mt-2 text-xs text-white/20 hover:text-white/40 transition-colors"
               >
-                {showDetails ? (
-                  <>
-                    <ChevronUp className="h-3 w-3" />
-                    收起详情
-                  </>
-                ) : (
-                  <>
-                    <ChevronDown className="h-3 w-3" />
-                    查看备注
-                  </>
-                )}
+                <CaretDown weight="bold" className="h-3 w-3" />
+                查看详情
               </button>
-              {showDetails && (
-                <div className="mt-2 text-xs text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 rounded p-2">
-                  <p className="whitespace-pre-wrap">{task.note}</p>
-                  <p className="mt-2 text-xs text-gray-400 dark:text-gray-500">
-                    创建于 {formatFullDate(task.createdAt)}
-                  </p>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Show created time if no note */}
-          {!task.note && showDetails && (
-            <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-              <button
-                onClick={() => setShowDetails(false)}
-                className="flex items-center gap-1 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
-              >
-                <ChevronUp className="h-3 w-3" />
-                收起
-              </button>
-              <p className="mt-2 text-gray-600 dark:text-gray-300">创建于 {formatFullDate(task.createdAt)}</p>
-            </div>
-          )}
-
-          {!task.note && !showDetails && (
-            <button
-              onClick={() => setShowDetails(true)}
-              className="flex items-center gap-1 mt-2 text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
-            >
-              <ChevronDown className="h-3 w-3" />
-              查看创建时间
-            </button>
-          )}
+            )}
+          </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

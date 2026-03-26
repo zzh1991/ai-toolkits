@@ -26,3 +26,5 @@ dist-ssr
 .claude
 md
 CLAUDE.md
+CLAUDE-*.md
+.playwright

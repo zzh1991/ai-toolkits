@@ -2,7 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, ArrowLeft } from 'lucide-react';
+import { Plus, ArrowLeft, Sparkle, CalendarHeart } from '@phosphor-icons/react';
 import { useReminderStore } from '@/modules/reminder/stores/reminderStore';
 import ReminderList from '@/modules/reminder/components/ReminderList';
 import ReminderForm from '@/modules/reminder/components/ReminderForm';
@@ -62,87 +62,116 @@ export default function ReminderPage() {
     setEditingReminder(undefined);
   }, []);
 
+  const upcomingCount = reminders.filter((r) => r.days >= 0).length;
+  const pastCount = reminders.filter((r) => r.days < 0).length;
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-      {/* Background decoration */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-1/2 -left-1/2 w-full h-full bg-gradient-to-br from-violet-500/20 to-transparent blur-3xl rounded-full" />
-        <div className="absolute -bottom-1/2 -right-1/2 w-full h-full bg-gradient-to-tl from-fuchsia-500/20 to-transparent blur-3xl rounded-full" />
+    <div className="min-h-screen bg-[#0a0a0b] relative">
+      {/* Subtle background */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-blue-500/[0.03] rounded-full blur-[120px]" />
+        <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-indigo-500/[0.03] rounded-full blur-[100px]" />
       </div>
 
       {/* Content */}
       <div className="relative max-w-2xl mx-auto px-4 py-6 sm:py-12 sm:px-6 lg:px-8 min-h-screen flex flex-col">
         {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: -10 }}
+          initial={{ opacity: 0, y: -16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-          className="flex items-center justify-between mb-6 sm:mb-10 gap-4"
+          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+          className="flex items-center justify-between mb-8 sm:mb-10 gap-4"
         >
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
             <Link to="/">
               <Button
                 variant="ghost"
                 size="icon"
-                className="text-white/70 hover:text-white hover:bg-white/10"
+                className="text-white/50 hover:text-white hover:bg-white/[0.05] rounded-xl"
               >
-                <ArrowLeft className="w-5 h-5" />
+                <ArrowLeft weight="bold" className="w-5 h-5" />
               </Button>
             </Link>
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">倒数日</h1>
-              <p className="text-white/50 mt-1 text-sm sm:text-base">记录每一个重要的日子</p>
+              <div className="flex items-center gap-2.5 mb-1">
+                <CalendarHeart weight="duotone" className="w-5 h-5 text-blue-400" />
+                <h1 className="text-2xl sm:text-3xl font-semibold text-white tracking-tight">倒数日</h1>
+              </div>
+              <p className="text-white/40 text-sm">记录每一个重要的日子</p>
             </div>
           </div>
           <Button
             onClick={handleAdd}
-            className="bg-white/10 hover:bg-white/20 text-white border border-white/20 rounded-full px-4 sm:px-6 backdrop-blur-xl whitespace-nowrap"
+            className="bg-blue-500 hover:bg-blue-400 text-white rounded-full px-4 sm:px-5 py-5 text-sm font-medium whitespace-nowrap transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
           >
-            <Plus className="w-4 h-4 sm:mr-2" />
+            <Plus weight="bold" className="w-4 h-4 sm:mr-2" />
             <span className="hidden sm:inline">新增</span>
-            <span className="sm:hidden">添加</span>
           </Button>
         </motion.div>
+
+        {/* Stats Summary */}
+        {!isLoading && reminders.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1, duration: 0.5 }}
+            className="grid grid-cols-3 gap-3 mb-6 sm:mb-8"
+          >
+            <div className="bg-[#141416] border border-white/[0.06] rounded-2xl p-4 text-center">
+              <p className="text-white/30 text-xs font-medium tracking-wide mb-1.5">总数</p>
+              <p className="text-2xl font-semibold text-white tabular-nums">{reminders.length}</p>
+            </div>
+            <div className="bg-[#141416] border border-white/[0.06] rounded-2xl p-4 text-center">
+              <p className="text-white/30 text-xs font-medium tracking-wide mb-1.5">倒数</p>
+              <p className="text-2xl font-semibold text-emerald-400 tabular-nums">{upcomingCount}</p>
+            </div>
+            <div className="bg-[#141416] border border-white/[0.06] rounded-2xl p-4 text-center">
+              <p className="text-white/30 text-xs font-medium tracking-wide mb-1.5">正数</p>
+              <p className="text-2xl font-semibold text-blue-400 tabular-nums">{pastCount}</p>
+            </div>
+          </motion.div>
+        )}
 
         {/* Reminder List */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.3, delay: 0.1 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
           className="flex-1"
         >
           {isLoading ? (
             <div className="flex items-center justify-center py-20">
-              <div className="w-8 h-8 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+              <div className="w-8 h-8 border-2 border-white/10 border-t-blue-400 rounded-full animate-spin" />
             </div>
           ) : reminders.length === 0 ? (
-            <div className="text-center py-12 sm:py-20 px-4">
-              <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 sm:mb-6 rounded-full bg-white/5 flex items-center justify-center">
-                <Plus className="w-6 h-6 sm:w-8 sm:h-8 text-white/30" />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5 }}
+              className="text-center py-16 sm:py-24 px-4"
+            >
+              <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-[#141416] border border-white/[0.06] flex items-center justify-center">
+                <Sparkle weight="duotone" className="w-10 h-10 text-white/20" />
               </div>
-              <h3 className="text-base sm:text-lg font-medium text-white/80 mb-2">还没有纪念日</h3>
-              <p className="text-white/40 text-sm mb-4 sm:mb-6">点击右上角按钮添加你的第一个纪念日</p>
+              <h3 className="text-lg font-medium text-white/80 mb-2">还没有纪念日</h3>
+              <p className="text-white/40 text-sm mb-8">点击右上角按钮添加你的第一个纪念日</p>
               <Button
                 onClick={handleAdd}
-                className="bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white border-0"
+                className="bg-blue-500 hover:bg-blue-400 text-white rounded-full px-6 py-5 text-sm font-medium transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
               >
-                <Plus className="w-4 h-4 mr-2" />
+                <Plus weight="bold" className="w-4 h-4 mr-2" />
                 添加纪念日
               </Button>
-            </div>
+            </motion.div>
           ) : (
-            <ReminderList
-              reminders={reminders}
-              onEdit={handleEdit}
-              onDelete={handleDelete}
-            />
+            <ReminderList reminders={reminders} onEdit={handleEdit} onDelete={handleDelete} />
           )}
         </motion.div>
 
         {/* Footer */}
         <footer className="mt-8 sm:mt-12 py-4 text-center">
-          <p className="text-xs sm:text-sm text-white/30">
-            Powered By <span className="text-white/50 font-medium">zzhpro</span>
+          <p className="text-xs text-white/20">
+            Powered by <span className="text-white/40 font-medium">zzhpro</span>
           </p>
         </footer>
       </div>
@@ -150,11 +179,7 @@ export default function ReminderPage() {
       {/* Form Modal */}
       <AnimatePresence>
         {isFormOpen && (
-          <ReminderForm
-            reminder={editingReminder}
-            onSubmit={handleSubmit}
-            onCancel={handleCancel}
-          />
+          <ReminderForm reminder={editingReminder} onSubmit={handleSubmit} onCancel={handleCancel} />
         )}
       </AnimatePresence>
     </div>

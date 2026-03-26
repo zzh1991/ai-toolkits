@@ -1,73 +1,117 @@
-# React + TypeScript + Vite
+# AI 工具集
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+一个精心设计的个人效率工具集合，采用现代 Web 技术栈构建，注重用户体验和视觉美感。
 
-Currently, two official plugins are available:
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind-4-06B6D4?logo=tailwindcss)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 特性
 
-## React Compiler
+- **倒数日** - 记录重要日子，支持农历和阳历，每年重复提醒
+- **四象限任务看板** - 基于艾森豪威尔矩阵的任务管理，区分重要与紧急
+- **停车倒计时** - 简洁的停车计时器，控制停车费用
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 设计理念
 
-## Expanding the ESLint configuration
+- **本地优先** - 数据存储在浏览器 IndexedDB 中，保护隐私，离线可用
+- **无需注册** - 打开即用，数据完全由你掌控
+- **精致设计** - 每个细节都经过深思熟虑，追求极致的用户体验
+- **深色主题** - 精心调校的深色界面，减少视觉疲劳
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 技术栈
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- **框架** - React 19 + React Router 7
+- **构建工具** - Vite 6
+- **语言** - TypeScript 5
+- **样式** - Tailwind CSS 4
+- **状态管理** - Zustand
+- **动画** - Framer Motion
+- **数据库** - IndexedDB + Dexie.js
+- **UI 组件** - shadcn/ui + Radix UI
+- **图标** - Phosphor Icons
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## 快速开始
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+# 克隆项目
+git clone <repository-url>
+cd ai-toolkits
+
+# 安装依赖
+pnpm install
+
+# 启动开发服务器
+pnpm dev
+
+# 构建生产版本
+pnpm build
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 项目结构
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
 ```
+src/
+├── app/                  # 应用入口与全局配置
+│   ├── App.tsx
+│   ├── router.tsx
+│   └── providers.tsx
+├── routes/               # 路由页面组件
+│   ├── landing/          # 首页
+│   ├── reminder/         # 倒数日
+│   ├── kanban/           # 任务看板
+│   └── parking/          # 停车计时
+├── modules/              # 业务模块
+│   ├── reminder/
+│   ├── kanban/
+│   └── ...
+├── shared/               # 共享资源
+│   ├── components/
+│   ├── hooks/
+│   └── lib/
+└── db/                   # IndexedDB 配置
+    ├── schema.ts
+    └── stores/
+```
+
+## 开发规范
+
+### 组件规范
+
+- 使用函数声明而非箭头函数
+- Props 使用解构接收
+- 接口命名规范：`组件名 + Props`
+- 组件名使用 PascalCase
+
+```tsx
+interface UserCardProps {
+  userId: string;
+  onSelect?: (userId: string) => void;
+}
+
+export default function UserCard({ userId, onSelect }: UserCardProps) {
+  // ...
+}
+```
+
+### 样式规范
+
+- 使用 Tailwind CSS 工具类
+- 复杂样式使用 `cn()` 工具函数合并
+- 自定义颜色通过 CSS 变量定义
+
+## 浏览器支持
+
+- Chrome 90+
+- Firefox 88+
+- Safari 14+
+- Edge 90+
+
+## 许可证
+
+MIT License
+
+---
+
+Powered by [zzhpro](https://github.com/zzhpro)

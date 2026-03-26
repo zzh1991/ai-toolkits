@@ -1,7 +1,7 @@
 // src/modules/reminder/components/ReminderCard.tsx
 import { useState, memo } from 'react';
 import { motion } from 'framer-motion';
-import { Edit2, Trash2 } from 'lucide-react';
+import { PencilSimple, Trash } from '@phosphor-icons/react';
 import { cn, formatDateDisplay } from '@/shared/lib/utils';
 import type { ReminderCardProps } from '@/modules/reminder/types/reminder';
 import { CARD_THEMES } from '@/shared/constants/colors';
@@ -17,27 +17,24 @@ export default memo(function ReminderCard({ reminder, onEdit, onDelete }: Remind
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      // 优化：使用更短的动画时长和更高效的缓动函数
+      exit={{ opacity: 0, y: -12 }}
       transition={{
-        duration: 0.25,
-        ease: [0.25, 0.46, 0.45, 0.94], // 自定义 cubic-bezier，更流畅
+        duration: 0.3,
+        ease: [0.16, 1, 0.3, 1],
         opacity: { duration: 0.2 },
       }}
-      // 优化：移除 layout prop 避免昂贵的布局计算
-      // 使用 CSS transform 代替
       style={{
-        background: `linear-gradient(135deg, ${theme.bg} 0%, rgba(255,255,255,0.05) 100%)`,
         willChange: 'transform, opacity',
       }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       className={cn(
-        'group relative overflow-hidden rounded-2xl sm:rounded-3xl p-4 sm:p-6 backdrop-blur-xl',
-        'border border-white/10 shadow-xl transition-shadow transition-transform',
-        'sm:hover:shadow-2xl sm:hover:-translate-y-1'
+        'group relative overflow-hidden rounded-2xl sm:rounded-3xl p-4 sm:p-6',
+        'bg-[#141416] border border-white/[0.06]',
+        'transition-all duration-300',
+        'hover:border-white/[0.12] hover:shadow-xl hover:shadow-black/20 hover:-translate-y-0.5'
       )}
     >
       {/* Color accent bar */}
@@ -48,11 +45,22 @@ export default memo(function ReminderCard({ reminder, onEdit, onDelete }: Remind
         }}
       />
 
-      <div className="flex items-center gap-3 sm:gap-6">
+      {/* Hover gradient overlay */}
+      <div
+        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+        style={{
+          background: `linear-gradient(135deg, ${theme.bg} 0%, transparent 60%)`,
+        }}
+      />
+
+      <div className="relative flex items-center gap-3 sm:gap-6">
         {/* Days count */}
         <div className="flex flex-col items-center justify-center min-w-[60px] sm:min-w-[80px]">
-          <span
-            className="text-2xl sm:text-4xl font-bold tracking-tight"
+          <motion.span
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+            className="text-2xl sm:text-4xl font-semibold tracking-tight tabular-nums"
             style={{
               background: `linear-gradient(135deg, ${theme.from} 0%, ${theme.to} 100%)`,
               WebkitBackgroundClip: 'text',
@@ -60,27 +68,29 @@ export default memo(function ReminderCard({ reminder, onEdit, onDelete }: Remind
             }}
           >
             {daysCount}
-          </span>
-          <span className="text-xs text-white/60 mt-0.5 sm:mt-1">天</span>
+          </motion.span>
+          <span className="text-xs text-white/40 mt-0.5 sm:mt-1">天</span>
         </div>
 
         {/* Content */}
         <div className="flex-1 min-w-0 pr-16 sm:pr-0">
-          <h3 className="text-base sm:text-lg font-semibold text-white/90 truncate">
+          <h3 className="text-base sm:text-lg font-medium text-white/90 truncate">
             {reminder.title}
           </h3>
-          <p className="text-xs sm:text-sm text-white/50 mt-0.5 sm:mt-1">
+          <p className="text-xs sm:text-sm text-white/40 mt-0.5 sm:mt-1">
             {daysLabel} · {formatDateDisplay(reminder.date, reminder.dateType)}
-            {reminder.isRepeating && ' · 每年重复'}
+            {reminder.isRepeating && (
+              <span className="ml-2 text-white/30">· 每年重复</span>
+            )}
           </p>
         </div>
 
-        {/* Actions - 移动端始终显示，桌面端hover显示 */}
+        {/* Actions */}
         <div
           className={cn(
-            'flex items-center gap-1 sm:gap-2',
+            'flex items-center gap-1 sm:gap-1.5',
             'absolute right-3 sm:relative sm:right-auto',
-            'transition-opacity duration-200',
+            'transition-all duration-200',
             'sm:opacity-0 sm:group-hover:opacity-100',
             isHovered ? 'opacity-100' : 'opacity-100 sm:opacity-0'
           )}
@@ -88,22 +98,22 @@ export default memo(function ReminderCard({ reminder, onEdit, onDelete }: Remind
           <button
             onClick={onEdit}
             className={cn(
-              'p-1.5 sm:p-2 rounded-full transition-colors',
-              'bg-white/10 sm:bg-white/5 hover:bg-white/10 text-white/70 sm:text-white/60 hover:text-white'
+              'p-2 sm:p-2.5 rounded-xl transition-all duration-200',
+              'bg-white/[0.05] hover:bg-white/10 text-white/50 hover:text-white hover:scale-105'
             )}
             aria-label="编辑"
           >
-            <Edit2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            <PencilSimple weight="bold" className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </button>
           <button
             onClick={onDelete}
             className={cn(
-              'p-1.5 sm:p-2 rounded-full transition-colors',
-              'bg-white/10 sm:bg-white/5 hover:bg-red-500/20 text-white/70 sm:text-white/60 hover:text-red-400'
+              'p-2 sm:p-2.5 rounded-xl transition-all duration-200',
+              'bg-white/[0.05] hover:bg-red-500/20 text-white/50 hover:text-red-400 hover:scale-105'
             )}
             aria-label="删除"
           >
-            <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            <Trash weight="bold" className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </button>
         </div>
       </div>

@@ -2,7 +2,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link } from 'react-router';
 import { motion } from 'framer-motion';
-import { Plus, LayoutGrid, ArrowLeft } from 'lucide-react';
+import { Plus, SquaresFour, ArrowLeft } from '@phosphor-icons/react';
 import { Button } from '@/shared/components/ui/button';
 import QuadrantColumn from './QuadrantColumn';
 import TaskForm from './TaskForm';
@@ -102,20 +102,20 @@ export default function KanbanBoard() {
   }, [tasks]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-      {/* Background decoration */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-1/2 -left-1/2 w-full h-full bg-gradient-to-br from-violet-500/20 to-transparent blur-3xl rounded-full" />
-        <div className="absolute -bottom-1/2 -right-1/2 w-full h-full bg-gradient-to-tl from-fuchsia-500/20 to-transparent blur-3xl rounded-full" />
+    <div className="min-h-screen bg-[#0a0a0b] relative">
+      {/* Subtle background */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-0 right-1/4 w-[500px] h-[500px] bg-emerald-500/[0.03] rounded-full blur-[120px]" />
+        <div className="absolute bottom-1/4 left-1/4 w-[400px] h-[400px] bg-teal-500/[0.03] rounded-full blur-[100px]" />
       </div>
 
       {/* Content */}
       <div className="relative max-w-7xl mx-auto px-4 py-6 sm:py-12 sm:px-6 lg:px-8 min-h-screen flex flex-col">
         {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: -10 }}
+          initial={{ opacity: 0, y: -16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
+          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
           className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 sm:mb-10 gap-4"
         >
           <div className="flex items-center gap-4">
@@ -123,80 +123,88 @@ export default function KanbanBoard() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="text-white/70 hover:text-white hover:bg-white/10"
+                className="text-white/50 hover:text-white hover:bg-white/[0.05] rounded-xl"
               >
-                <ArrowLeft className="w-5 h-5" />
+                <ArrowLeft weight="bold" className="w-5 h-5" />
               </Button>
             </Link>
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight flex items-center gap-2">
-                <LayoutGrid className="w-6 h-6 sm:w-8 sm:h-8" />
+              <h1 className="text-2xl sm:text-3xl font-semibold text-white tracking-tight flex items-center gap-2.5">
+                <SquaresFour weight="duotone" className="w-7 h-7 text-emerald-400" />
                 四象限任务看板
               </h1>
-              <p className="text-white/50 mt-1 text-sm sm:text-base">
+              <p className="text-white/40 mt-1 text-sm sm:text-base">
                 按重要性和紧急程度管理你的任务
               </p>
             </div>
           </div>
           <Button
             onClick={() => handleAdd('important-urgent')}
-            className="bg-white/10 hover:bg-white/20 text-white border border-white/20 rounded-full px-4 sm:px-6 backdrop-blur-xl whitespace-nowrap"
+            className="bg-emerald-500 hover:bg-emerald-400 text-[#0a0a0b] rounded-full px-4 sm:px-5 py-5 text-sm font-medium whitespace-nowrap transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
           >
-            <Plus className="w-4 h-4 sm:mr-2" />
+            <Plus weight="bold" className="w-4 h-4 sm:mr-2" />
             <span className="hidden sm:inline">新建任务</span>
-            <span className="sm:hidden">添加</span>
           </Button>
         </motion.div>
 
         {/* Global Stats */}
         <motion.div
-          initial={{ opacity: 0, y: -5 }}
+          initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.1 }}
+          transition={{ duration: 0.4, delay: 0.1 }}
           className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6 sm:mb-8"
         >
-          <div className="bg-white/5 border border-white/10 rounded-lg p-4 backdrop-blur-sm">
-            <p className="text-white/50 text-xs uppercase tracking-wider">总任务</p>
-            <p className="text-2xl font-bold text-white mt-1">{stats.total}</p>
-          </div>
-          <div className="bg-white/5 border border-white/10 rounded-lg p-4 backdrop-blur-sm">
-            <p className="text-white/50 text-xs uppercase tracking-wider">待办</p>
-            <p className="text-2xl font-bold text-amber-400 mt-1">{stats.uncompleted}</p>
-          </div>
-          <div className="bg-white/5 border border-white/10 rounded-lg p-4 backdrop-blur-sm">
-            <p className="text-white/50 text-xs uppercase tracking-wider">已完成</p>
-            <p className="text-2xl font-bold text-green-400 mt-1">{stats.completed}</p>
-          </div>
-          <div className="bg-white/5 border border-white/10 rounded-lg p-4 backdrop-blur-sm">
-            <p className="text-white/50 text-xs uppercase tracking-wider">今日截止</p>
-            <p className="text-2xl font-bold text-red-400 mt-1">{stats.todayDue}</p>
-          </div>
+          {[
+            { label: '总任务', value: stats.total, color: 'text-white' },
+            { label: '待办', value: stats.uncompleted, color: 'text-amber-400' },
+            { label: '已完成', value: stats.completed, color: 'text-emerald-400' },
+            { label: '今日截止', value: stats.todayDue, color: 'text-red-400' },
+          ].map((stat, index) => (
+            <motion.div
+              key={stat.label}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 + index * 0.05 }}
+              className="bg-[#141416] border border-white/[0.06] rounded-2xl p-4 hover:border-white/[0.1] transition-colors"
+            >
+              <p className="text-white/30 text-xs font-medium tracking-wide mb-1.5">{stat.label}</p>
+              <p className={`text-2xl sm:text-3xl font-semibold tabular-nums ${stat.color}`}>
+                {stat.value}
+              </p>
+            </motion.div>
+          ))}
         </motion.div>
 
         {/* Kanban Grid */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.3, delay: 0.2 }}
+          transition={{ duration: 0.4, delay: 0.2 }}
           className="flex-1"
         >
           {isLoading ? (
             <div className="flex items-center justify-center py-20">
-              <div className="w-8 h-8 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+              <div className="w-8 h-8 border-2 border-white/10 border-t-emerald-400 rounded-full animate-spin" />
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 h-full">
-              {QUADRANT_ORDER.map((quadrant) => (
-                <QuadrantColumn
+              {QUADRANT_ORDER.map((quadrant, index) => (
+                <motion.div
                   key={quadrant}
-                  quadrant={quadrant}
-                  tasks={tasksByQuadrant[quadrant]}
-                  stats={quadrantStats[quadrant]}
-                  onAdd={handleAdd}
-                  onEdit={handleEdit}
-                  onDelete={handleDelete}
-                  onToggleComplete={handleToggleComplete}
-                />
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 + index * 0.1 }}
+                >
+                  <QuadrantColumn
+                    quadrant={quadrant}
+                    tasks={tasksByQuadrant[quadrant]}
+                    stats={quadrantStats[quadrant]}
+                    onAdd={handleAdd}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                    onToggleComplete={handleToggleComplete}
+                  />
+                </motion.div>
               ))}
             </div>
           )}
@@ -204,8 +212,8 @@ export default function KanbanBoard() {
 
         {/* Footer */}
         <footer className="mt-8 sm:mt-12 py-4 text-center">
-          <p className="text-xs sm:text-sm text-white/30">
-            Powered By <span className="text-white/50 font-medium">zzhpro</span>
+          <p className="text-xs text-white/20">
+            Powered by <span className="text-white/40 font-medium">zzhpro</span>
           </p>
         </footer>
       </div>
