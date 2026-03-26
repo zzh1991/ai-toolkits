@@ -9,7 +9,6 @@ import {
   Trash,
   PencilSimple,
   CheckCircle,
-  Check,
 } from '@phosphor-icons/react';
 import { Checkbox } from '@/shared/components/ui/checkbox';
 import { Button } from '@/shared/components/ui/button';
