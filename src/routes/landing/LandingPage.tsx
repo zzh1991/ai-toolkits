@@ -1,6 +1,7 @@
 // src/routes/landing/LandingPage.tsx
+import { useState } from 'react';
 import { Link } from 'react-router';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowRight,
   Lightning,
@@ -10,8 +11,10 @@ import {
   SquaresFour,
   CalendarHeart,
   Car,
+  Database,
 } from '@phosphor-icons/react';
 import { Button } from '@/shared/components/ui/button';
+import DataTransferDialog from '@/shared/components/DataTransferDialog';
 
 const fadeInUp = {
   initial: { opacity: 0, y: 20 },
@@ -134,6 +137,8 @@ function ToolCard({ title, subtitle, description, to, icon, gradient, index }: T
 }
 
 export default function LandingPage() {
+  const [isDataDialogOpen, setIsDataDialogOpen] = useState(false);
+
   const tools = [
     {
       title: '倒数日',
@@ -198,6 +203,15 @@ export default function LandingPage() {
                   </Link>
                 ))}
               </div>
+
+              {/* Data Management Button */}
+              <button
+                onClick={() => setIsDataDialogOpen(true)}
+                className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm text-white/60 hover:text-white hover:bg-white/5 transition-all duration-200"
+              >
+                <Database weight="bold" className="w-4 h-4" />
+                <span className="hidden md:inline">数据管理</span>
+              </button>
             </div>
           </div>
         </div>
@@ -467,6 +481,16 @@ export default function LandingPage() {
           </div>
         </div>
       </footer>
+
+      {/* Data Transfer Dialog */}
+      <AnimatePresence>
+        {isDataDialogOpen && (
+          <DataTransferDialog
+            isOpen={isDataDialogOpen}
+            onClose={() => setIsDataDialogOpen(false)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }
