@@ -12,6 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/shared/components/ui/select';
+import DateTimePicker from '@/shared/components/DateTimePicker';
 import type { Task, QuadrantType } from '@/db/schema';
 import { QUADRANT_LABELS } from '../types/task';
 import { cn } from '@/shared/lib/utils';
@@ -185,12 +186,11 @@ export default function TaskForm({
             <Label htmlFor="deadline" className="text-sm text-white/70">
               截止时间
             </Label>
-            <Input
-              id="deadline"
-              type="datetime-local"
+            <DateTimePicker
               value={deadline}
-              onChange={(e) => setDeadline(e.target.value)}
-              className="bg-white/[0.03] border-white/[0.08] text-white h-11 rounded-xl focus:border-emerald-500/50 focus:ring-emerald-500/10 focus:ring-1 [color-scheme:dark]"
+              onChange={setDeadline}
+              placeholder="选择截止时间（可选）"
+              accentColor="emerald"
             />
           </div>
 

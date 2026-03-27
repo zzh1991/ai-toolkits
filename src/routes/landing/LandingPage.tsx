@@ -16,24 +16,28 @@ import {
 import { Button } from '@/shared/components/ui/button';
 import DataTransferDialog from '@/shared/components/DataTransferDialog';
 
+// Performance optimized: use transform instead of layout-triggering properties
 const fadeInUp = {
-  initial: { opacity: 0, y: 20 },
+  initial: { opacity: 0, y: 16 },
   animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] },
+  transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] },
 };
 
 const staggerContainer = {
   animate: {
     transition: {
-      staggerChildren: 0.08,
+      staggerChildren: 0.06,
+      delayChildren: 0.1,
     },
   },
 };
 
+// Optimized spring: lower stiffness for smoother, less CPU-intensive animation
 const springTransition = {
   type: 'spring' as const,
-  stiffness: 100,
-  damping: 20,
+  stiffness: 80,
+  damping: 15,
+  mass: 0.8,
 };
 
 interface ToolCardProps {
@@ -51,10 +55,15 @@ function ToolCard({ title, subtitle, description, to, icon, gradient, index }: T
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 40 }}
+      initial={{ opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-50px' }}
-      transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: index * 0.1 }}
+      viewport={{ once: true, margin: '-100px' }}
+      transition={{
+        duration: 0.5,
+        ease: [0.16, 1, 0.3, 1],
+        delay: index * 0.08
+      }}
+      style={{ willChange: 'transform, opacity' }}
       className="group relative"
     >
       <div
@@ -67,11 +76,8 @@ function ToolCard({ title, subtitle, description, to, icon, gradient, index }: T
         <div className={`flex flex-col lg:flex-row ${isEven ? '' : 'lg:flex-row-reverse'}`}>
           {/* Content Side */}
           <div className="flex-1 p-8 lg:p-12 xl:p-16 relative">
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.15 }}
+            <div
+              className="transition-opacity duration-500"
             >
               <span
                 className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium bg-gradient-to-r ${gradient} text-white/90 mb-6 border border-white/10`}
@@ -100,7 +106,7 @@ function ToolCard({ title, subtitle, description, to, icon, gradient, index }: T
                   />
                 </Button>
               </Link>
-            </motion.div>
+            </div>
           </div>
 
           {/* Visual Side */}
@@ -109,10 +115,9 @@ function ToolCard({ title, subtitle, description, to, icon, gradient, index }: T
               className={`absolute inset-0 bg-gradient-to-br ${gradient} opacity-10 group-hover:opacity-15 transition-opacity duration-500`}
             />
             <div className="absolute inset-0 flex items-center justify-center p-8">
-              <motion.div
-                className="relative w-full h-full"
-                whileHover={{ scale: 1.02 }}
-                transition={springTransition}
+              <div
+                className="relative w-full h-full transition-transform duration-300 ease-out group-hover:scale-[1.02]"
+                style={{ willChange: 'transform' }}
               >
                 {/* Abstract UI representation */}
                 <div className="absolute inset-0 flex items-center justify-center">
@@ -127,7 +132,7 @@ function ToolCard({ title, subtitle, description, to, icon, gradient, index }: T
                     </div>
                   </div>
                 </div>
-              </motion.div>
+              </div>
             </div>
           </div>
         </div>
@@ -175,7 +180,8 @@ export default function LandingPage() {
       <motion.nav
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+        style={{ willChange: 'transform, opacity' }}
         className="fixed top-0 left-0 right-0 z-50"
       >
         <div className="mx-4 mt-4">
@@ -278,9 +284,10 @@ export default function LandingPage() {
 
             {/* Right visual - asymmetric offset */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.95, x: 20 }}
-              animate={{ opacity: 1, scale: 1, x: 0 }}
-              transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.15 }}
+              style={{ willChange: 'transform, opacity' }}
               className="relative hidden lg:block"
             >
               <div className="relative">
@@ -303,11 +310,9 @@ export default function LandingPage() {
                   </div>
                 </div>
 
-                {/* Floating card - offset */}
-                <motion.div
-                  animate={{ y: [0, -8, 0] }}
-                  transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-                  className="absolute -left-8 bottom-16 w-48"
+                {/* Floating card - CSS animation for better performance */}
+                <div
+                  className="absolute -left-8 bottom-16 w-48 animate-float"
                 >
                   <div className="rounded-2xl bg-gradient-to-br from-emerald-500/10 to-teal-500/10 border border-white/[0.08] backdrop-blur-xl p-4 shadow-2xl">
                     <div className="flex items-center gap-3">
@@ -320,7 +325,7 @@ export default function LandingPage() {
                       </div>
                     </div>
                   </div>
-                </motion.div>
+                </div>
               </div>
             </motion.div>
           </div>
@@ -331,9 +336,11 @@ export default function LandingPage() {
       <section className="py-32 relative">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+            viewport={{ once: true, margin: '-50px' }}
+            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+            style={{ willChange: 'transform, opacity' }}
             className="mb-20"
           >
             <h2 className="text-3xl lg:text-4xl font-semibold text-white tracking-tight mb-4">
@@ -374,10 +381,15 @@ export default function LandingPage() {
             ].map((feature, index) => (
               <motion.div
                 key={feature.title}
-                initial={{ opacity: 0, y: 24 }}
+                initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
+                viewport={{ once: true, margin: '-30px' }}
+                transition={{
+                  duration: 0.4,
+                  ease: [0.16, 1, 0.3, 1],
+                  delay: index * 0.08
+                }}
+                style={{ willChange: 'transform, opacity' }}
                 className={`${feature.span} group`}
               >
                 <div className="h-full p-8 rounded-3xl bg-[#141416] border border-white/[0.06] hover:border-white/[0.12] transition-all duration-500 hover:shadow-2xl hover:shadow-black/30">
@@ -397,9 +409,11 @@ export default function LandingPage() {
       <section className="py-32 relative">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+            viewport={{ once: true, margin: '-50px' }}
+            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+            style={{ willChange: 'transform, opacity' }}
             className="mb-20"
           >
             <h2 className="text-3xl lg:text-4xl font-semibold text-white tracking-tight mb-4">
@@ -422,10 +436,11 @@ export default function LandingPage() {
       <section className="py-32 relative">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div
-            initial={{ opacity: 0, y: 24 }}
+            initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
+            viewport={{ once: true, margin: '-50px' }}
+            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+            style={{ willChange: 'transform, opacity' }}
           >
             <h2 className="text-4xl lg:text-5xl font-semibold text-white tracking-tight mb-6">
               开始使用

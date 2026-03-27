@@ -7,6 +7,7 @@ import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
 import { Label } from '@/shared/components/ui/label';
 import { Switch } from '@/shared/components/ui/switch';
+import DatePicker from '@/shared/components/DatePicker';
 import type { ReminderFormProps, ReminderFormData } from '@/modules/reminder/types/reminder';
 import { CARD_THEMES } from '@/shared/constants/colors';
 
@@ -151,17 +152,24 @@ export default function ReminderForm({ reminder, onSubmit, onCancel }: ReminderF
           {/* Date */}
           <div className="space-y-2">
             <Label htmlFor="date" className="text-sm text-white/70">日期</Label>
-            <Input
-              id="date"
-              type="date"
+            <DatePicker
               value={formData.date}
-              onChange={(e) => updateField('date', e.target.value)}
-              className={cn(
-                'bg-white/[0.03] border-white/[0.08] text-white h-11 rounded-xl',
-                'focus:border-blue-500/50 focus:ring-blue-500/10 focus:ring-1',
-                errors.date && 'border-red-500/50'
-              )}
+              onChange={(value) => updateField('date', value)}
+              placeholder="选择日期"
+              accentColor="blue"
             />
+            <AnimatePresence>
+              {errors.date && (
+                <motion.p
+                  initial={{ opacity: 0, y: -8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  className="text-xs text-red-400/80"
+                >
+                  {errors.date}
+                </motion.p>
+              )}
+            </AnimatePresence>
           </div>
 
           {/* Repeating */}

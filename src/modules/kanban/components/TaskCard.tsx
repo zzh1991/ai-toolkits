@@ -56,14 +56,18 @@ export default function TaskCard({
 
   return (
     <motion.div
-      layout
-      initial={{ opacity: 0, y: 8 }}
+      initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -8 }}
-      className={`group relative rounded-xl border transition-all duration-300 ${
+      exit={{ opacity: 0, y: -6, transition: { duration: 0.15 } }}
+      transition={{
+        duration: 0.25,
+        ease: [0.16, 1, 0.3, 1],
+      }}
+      style={{ willChange: 'transform, opacity' }}
+      className={`group relative rounded-xl border transition-all duration-200 ${
         isCompleted
           ? 'bg-white/[0.02] border-white/[0.04] opacity-50'
-          : 'bg-[#1a1a1c] border-white/[0.06] hover:border-white/[0.1] hover:shadow-lg hover:shadow-black/20'
+          : 'bg-[#1a1a1c] border-white/[0.06] hover:border-white/[0.1]'
       }`}
     >
       <div className="p-3.5">
@@ -71,22 +75,23 @@ export default function TaskCard({
           <Checkbox
             checked={task.isCompleted}
             onCheckedChange={handleToggle}
-            className={`mt-0.5 border-white/20 data-[state=checked]:bg-emerald-500 data-[state=checked]:border-emerald-500 transition-all duration-200`}
+            className={`mt-0.5 border-white/20 data-[state=checked]:bg-emerald-500 data-[state=checked]:border-emerald-500 transition-colors duration-150`}
           />
           <div className="flex-1 min-w-0">
             <div className="flex items-start justify-between gap-2">
               <h4
-                className={`text-sm font-medium leading-tight transition-all ${
+                className={`text-sm font-medium leading-tight transition-colors duration-200 ${
                   isCompleted ? 'line-through text-white/30' : 'text-white/80'
                 }`}
               >
                 {task.title}
               </h4>
-              <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+              <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-7 w-7 rounded-lg text-white/30 hover:text-white hover:bg-white/[0.05]"
+                  className="h-7 w-7 rounded-lg text-white/30 hover:text-white hover:bg-white/[0.05] transition-all duration-150 active:scale-95"
+                  style={{ willChange: 'transform' }}
                   onClick={handleEdit}
                 >
                   <PencilSimple weight="bold" className="h-3.5 w-3.5" />
@@ -94,7 +99,8 @@ export default function TaskCard({
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-7 w-7 rounded-lg text-white/30 hover:text-red-400 hover:bg-red-500/10"
+                  className="h-7 w-7 rounded-lg text-white/30 hover:text-red-400 hover:bg-red-500/10 transition-all duration-150 active:scale-95"
+                  style={{ willChange: 'transform' }}
                   onClick={handleDelete}
                 >
                   <Trash weight="bold" className="h-3.5 w-3.5" />
@@ -139,13 +145,18 @@ export default function TaskCard({
                     </>
                   )}
                 </button>
-                <AnimatePresence>
+                <AnimatePresence initial={false}>
                   {showDetails && (
                     <motion.div
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: 'auto' }}
                       exit={{ opacity: 0, height: 0 }}
-                      className="mt-2 text-xs text-white/60 bg-white/[0.03] rounded-lg p-3 border border-white/[0.06]"
+                      transition={{
+                        duration: 0.2,
+                        ease: [0.16, 1, 0.3, 1],
+                      }}
+                      style={{ willChange: 'height, opacity' }}
+                      className="mt-2 text-xs text-white/60 bg-white/[0.03] rounded-lg p-3 border border-white/[0.06] overflow-hidden"
                     >
                       <p className="whitespace-pre-wrap leading-relaxed">{task.note}</p>
                       <p className="mt-3 text-white/30">创建于 {formatFullDate(task.createdAt)}</p>
@@ -156,28 +167,37 @@ export default function TaskCard({
             )}
 
             {/* Show created time if no note */}
-            {!task.note && showDetails && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                className="mt-2 text-xs text-white/40"
-              >
-                <button
-                  onClick={() => setShowDetails(false)}
-                  className="flex items-center gap-1 hover:text-white/60 transition-colors"
-                >
-                  <CaretUp weight="bold" className="h-3 w-3" />
-                  收起
-                </button>
-                <p className="mt-2 text-white/25">创建于 {formatFullDate(task.createdAt)}</p>
-              </motion.div>
+            {!task.note && (
+              <AnimatePresence initial={false}>
+                {showDetails && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{
+                      duration: 0.2,
+                      ease: [0.16, 1, 0.3, 1],
+                    }}
+                    style={{ willChange: 'height, opacity' }}
+                    className="mt-2 overflow-hidden"
+                  >
+                    <button
+                      onClick={() => setShowDetails(false)}
+                      className="flex items-center gap-1 text-xs text-white/30 hover:text-white/50 transition-colors py-1"
+                    >
+                      <CaretUp weight="bold" className="h-3 w-3" />
+                      收起
+                    </button>
+                    <p className="mt-2 text-xs text-white/25">创建于 {formatFullDate(task.createdAt)}</p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             )}
 
             {!task.note && !showDetails && (
               <button
                 onClick={() => setShowDetails(true)}
-                className="flex items-center gap-1 mt-2 text-xs text-white/20 hover:text-white/40 transition-colors"
+                className="flex items-center gap-1 mt-2 text-xs text-white/30 hover:text-white/50 transition-colors"
               >
                 <CaretDown weight="bold" className="h-3 w-3" />
                 查看详情

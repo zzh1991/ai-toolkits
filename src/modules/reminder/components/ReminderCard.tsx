@@ -1,5 +1,5 @@
 // src/modules/reminder/components/ReminderCard.tsx
-import { useState, memo } from 'react';
+import { memo } from 'react';
 import { motion } from 'framer-motion';
 import { PencilSimple, Trash } from '@phosphor-icons/react';
 import { cn, formatDateDisplay } from '@/shared/lib/utils';
@@ -8,8 +8,6 @@ import { CARD_THEMES } from '@/shared/constants/colors';
 
 // 使用 memo 避免不必要的重渲染
 export default memo(function ReminderCard({ reminder, onEdit, onDelete }: ReminderCardProps) {
-  const [isHovered, setIsHovered] = useState(false);
-
   const theme = CARD_THEMES.find((t) => t.name === reminder.color) || CARD_THEMES[0];
   const isPast = reminder.days < 0;
   const daysCount = Math.abs(reminder.days);
@@ -17,24 +15,21 @@ export default memo(function ReminderCard({ reminder, onEdit, onDelete }: Remind
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 16 }}
+      initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -12 }}
+      exit={{ opacity: 0, y: -8, transition: { duration: 0.15 } }}
       transition={{
-        duration: 0.3,
+        duration: 0.35,
         ease: [0.16, 1, 0.3, 1],
-        opacity: { duration: 0.2 },
       }}
       style={{
         willChange: 'transform, opacity',
       }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
       className={cn(
         'group relative overflow-hidden rounded-2xl sm:rounded-3xl p-4 sm:p-6',
         'bg-[#141416] border border-white/[0.06]',
         'transition-all duration-300',
-        'hover:border-white/[0.12] hover:shadow-xl hover:shadow-black/20 hover:-translate-y-0.5'
+        'hover:border-white/[0.12] hover:shadow-lg hover:shadow-black/20'
       )}
     >
       {/* Color accent bar */}
@@ -56,19 +51,17 @@ export default memo(function ReminderCard({ reminder, onEdit, onDelete }: Remind
       <div className="relative flex items-center gap-3 sm:gap-6">
         {/* Days count */}
         <div className="flex flex-col items-center justify-center min-w-[60px] sm:min-w-[80px]">
-          <motion.span
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className="text-2xl sm:text-4xl font-semibold tracking-tight tabular-nums"
+          <span
+            className="text-2xl sm:text-4xl font-semibold tracking-tight tabular-nums transition-transform duration-300"
             style={{
               background: `linear-gradient(135deg, ${theme.from} 0%, ${theme.to} 100%)`,
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
+              willChange: 'transform',
             }}
           >
             {daysCount}
-          </motion.span>
+          </span>
           <span className="text-xs text-white/40 mt-0.5 sm:mt-1">天</span>
         </div>
 
@@ -90,17 +83,18 @@ export default memo(function ReminderCard({ reminder, onEdit, onDelete }: Remind
           className={cn(
             'flex items-center gap-1 sm:gap-1.5',
             'absolute right-3 sm:relative sm:right-auto',
-            'transition-all duration-200',
-            'sm:opacity-0 sm:group-hover:opacity-100',
-            isHovered ? 'opacity-100' : 'opacity-100 sm:opacity-0'
+            'transition-opacity duration-200',
+            'sm:opacity-0 sm:group-hover:opacity-100'
           )}
         >
           <button
             onClick={onEdit}
             className={cn(
               'p-2 sm:p-2.5 rounded-xl transition-all duration-200',
-              'bg-white/[0.05] hover:bg-white/10 text-white/50 hover:text-white hover:scale-105'
+              'bg-white/[0.05] hover:bg-white/10 text-white/50 hover:text-white',
+              'transform hover:scale-105 active:scale-95'
             )}
+            style={{ willChange: 'transform' }}
             aria-label="编辑"
           >
             <PencilSimple weight="bold" className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -109,8 +103,10 @@ export default memo(function ReminderCard({ reminder, onEdit, onDelete }: Remind
             onClick={onDelete}
             className={cn(
               'p-2 sm:p-2.5 rounded-xl transition-all duration-200',
-              'bg-white/[0.05] hover:bg-red-500/20 text-white/50 hover:text-red-400 hover:scale-105'
+              'bg-white/[0.05] hover:bg-red-500/20 text-white/50 hover:text-red-400',
+              'transform hover:scale-105 active:scale-95'
             )}
+            style={{ willChange: 'transform' }}
             aria-label="删除"
           >
             <Trash weight="bold" className="w-3.5 h-3.5 sm:w-4 sm:h-4" />

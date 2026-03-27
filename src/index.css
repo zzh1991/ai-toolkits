@@ -212,6 +212,11 @@
   50% { transform: translateY(-8px); }
 }
 
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+  will-change: transform;
+}
+
 @keyframes shimmer {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }

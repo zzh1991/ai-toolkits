@@ -2,7 +2,7 @@
 import { useState, useMemo } from 'react';
 import { Plus, CaretDown, CaretUp } from '@phosphor-icons/react';
 import { Button } from '@/shared/components/ui/button';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import TaskCard from './TaskCard';
 import type { Task, QuadrantType } from '@/db/schema';
 import { QUADRANT_LABELS } from '../types/task';
@@ -90,11 +90,8 @@ export default function QuadrantColumn({
   const accent = getAccentStyles();
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
-      className={`flex flex-col h-full rounded-2xl border border-white/[0.06] ${accent.bg} backdrop-blur-xl overflow-hidden transition-all duration-300 hover:border-white/[0.1]`}
+    <div
+      className={`flex flex-col h-full rounded-2xl border border-white/[0.06] ${accent.bg} backdrop-blur-xl overflow-hidden transition-all duration-200 hover:border-white/[0.1]`}
     >
       {/* Header */}
       <div className="relative p-4">
@@ -149,7 +146,7 @@ export default function QuadrantColumn({
           </div>
         ) : (
           <>
-            <AnimatePresence mode="popLayout">
+            <div className="space-y-2">
               {uncompleted.map((task) => (
                 <TaskCard
                   key={task.id}
@@ -160,7 +157,7 @@ export default function QuadrantColumn({
                   onDelete={onDelete}
                 />
               ))}
-            </AnimatePresence>
+            </div>
 
             {/* Completed tasks section */}
             {completed.length > 0 && (
@@ -176,13 +173,18 @@ export default function QuadrantColumn({
                   )}
                   已完成 ({completed.length})
                 </button>
-                <AnimatePresence>
+                <AnimatePresence initial={false}>
                   {showCompleted && (
                     <motion.div
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: 'auto' }}
                       exit={{ opacity: 0, height: 0 }}
-                      className="space-y-2 mt-2"
+                      transition={{
+                        duration: 0.2,
+                        ease: [0.16, 1, 0.3, 1],
+                      }}
+                      style={{ willChange: 'height, opacity' }}
+                      className="space-y-2 mt-2 overflow-hidden"
                     >
                       {completed.map((task) => (
                         <TaskCard
@@ -202,6 +204,6 @@ export default function QuadrantColumn({
           </>
         )}
       </div>
-    </motion.div>
+    </div>
   );
 }

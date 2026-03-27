@@ -113,9 +113,10 @@ export default function KanbanBoard() {
       <div className="relative max-w-7xl mx-auto px-4 py-6 sm:py-12 sm:px-6 lg:px-8 min-h-screen flex flex-col">
         {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: -16 }}
+          initial={{ opacity: 0, y: -12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+          style={{ willChange: 'transform, opacity' }}
           className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 sm:mb-10 gap-4"
         >
           <div className="flex items-center gap-4">
@@ -151,7 +152,8 @@ export default function KanbanBoard() {
         <motion.div
           initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.1 }}
+          transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1], delay: 0.05 }}
+          style={{ willChange: 'transform, opacity' }}
           className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6 sm:mb-8"
         >
           {[
@@ -159,19 +161,16 @@ export default function KanbanBoard() {
             { label: '待办', value: stats.uncompleted, color: 'text-amber-400' },
             { label: '已完成', value: stats.completed, color: 'text-emerald-400' },
             { label: '今日截止', value: stats.todayDue, color: 'text-red-400' },
-          ].map((stat, index) => (
-            <motion.div
+          ].map((stat) => (
+            <div
               key={stat.label}
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 + index * 0.05 }}
-              className="bg-[#141416] border border-white/[0.06] rounded-2xl p-4 hover:border-white/[0.1] transition-colors"
+              className="bg-[#141416] border border-white/[0.06] rounded-2xl p-4 hover:border-white/[0.1] transition-colors duration-200"
             >
               <p className="text-white/30 text-xs font-medium tracking-wide mb-1.5">{stat.label}</p>
               <p className={`text-2xl sm:text-3xl font-semibold tabular-nums ${stat.color}`}>
                 {stat.value}
               </p>
-            </motion.div>
+            </div>
           ))}
         </motion.div>
 
@@ -179,7 +178,8 @@ export default function KanbanBoard() {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.4, delay: 0.2 }}
+          transition={{ duration: 0.3, delay: 0.15 }}
+          style={{ willChange: 'opacity' }}
           className="flex-1"
         >
           {isLoading ? (
@@ -188,23 +188,17 @@ export default function KanbanBoard() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 h-full">
-              {QUADRANT_ORDER.map((quadrant, index) => (
-                <motion.div
+              {QUADRANT_ORDER.map((quadrant) => (
+                <QuadrantColumn
                   key={quadrant}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 + index * 0.1 }}
-                >
-                  <QuadrantColumn
-                    quadrant={quadrant}
-                    tasks={tasksByQuadrant[quadrant]}
-                    stats={quadrantStats[quadrant]}
-                    onAdd={handleAdd}
-                    onEdit={handleEdit}
-                    onDelete={handleDelete}
-                    onToggleComplete={handleToggleComplete}
-                  />
-                </motion.div>
+                  quadrant={quadrant}
+                  tasks={tasksByQuadrant[quadrant]}
+                  stats={quadrantStats[quadrant]}
+                  onAdd={handleAdd}
+                  onEdit={handleEdit}
+                  onDelete={handleDelete}
+                  onToggleComplete={handleToggleComplete}
+                />
               ))}
             </div>
           )}
