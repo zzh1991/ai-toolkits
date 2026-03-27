@@ -1,5 +1,5 @@
 // src/modules/kanban/components/QuadrantColumn.tsx
-import { useState, useMemo } from 'react';
+import { useState, useMemo, memo } from 'react';
 import { Plus, CaretDown, CaretUp } from '@phosphor-icons/react';
 import { Button } from '@/shared/components/ui/button';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -22,6 +22,9 @@ interface QuadrantColumnProps {
   onToggleComplete: (id: number, isCompleted: boolean) => void;
 }
 
+// Memoized task item to prevent unnecessary re-renders
+const MemoizedTaskCard = memo(TaskCard);
+
 export default function QuadrantColumn({
   quadrant,
   tasks,
@@ -33,32 +36,39 @@ export default function QuadrantColumn({
 }: QuadrantColumnProps) {
   const [showCompleted, setShowCompleted] = useState(false);
 
+  // Use stable references for sorting to prevent recalculation on every render
   const { uncompleted, completed } = useMemo(() => {
-    const uncompleted = tasks
-      .filter((t) => !t.isCompleted)
-      .sort((a, b) => {
-        // Sort by deadline (ascending), tasks without deadline go last
-        if (!a.deadline) return 1;
-        if (!b.deadline) return -1;
-        return new Date(a.deadline).getTime() - new Date(b.deadline).getTime();
-      });
+    // Pre-allocate arrays for better performance
+    const uncompleted: Task[] = [];
+    const completed: Task[] = [];
 
-    const completed = tasks
-      .filter((t) => t.isCompleted)
-      .sort((a, b) => {
-        // Sort by completedAt (descending)
-        if (!a.completedAt) return 1;
-        if (!b.completedAt) return -1;
-        return new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime();
-      });
+    for (const task of tasks) {
+      if (task.isCompleted) {
+        completed.push(task);
+      } else {
+        uncompleted.push(task);
+      }
+    }
+
+    // Sort uncompleted by deadline (ascending)
+    uncompleted.sort((a, b) => {
+      if (!a.deadline) return 1;
+      if (!b.deadline) return -1;
+      return new Date(a.deadline).getTime() - new Date(b.deadline).getTime();
+    });
+
+    // Sort completed by completedAt (descending)
+    completed.sort((a, b) => {
+      if (!a.completedAt) return 1;
+      if (!b.completedAt) return -1;
+      return new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime();
+    });
 
     return { uncompleted, completed };
   }, [tasks]);
 
-  const label = QUADRANT_LABELS[quadrant];
-
-  // Get quadrant-specific accent colors - refined palette
-  const getAccentStyles = () => {
+  // Memoize accent styles to prevent recalculation
+  const accent = useMemo(() => {
     switch (quadrant) {
       case 'important-urgent':
         return {
@@ -85,9 +95,9 @@ export default function QuadrantColumn({
           bg: 'bg-slate-500/[0.03]',
         };
     }
-  };
+  }, [quadrant]);
 
-  const accent = getAccentStyles();
+  const label = QUADRANT_LABELS[quadrant];
 
   return (
     <div
@@ -148,7 +158,7 @@ export default function QuadrantColumn({
           <>
             <div className="space-y-2">
               {uncompleted.map((task) => (
-                <TaskCard
+                <MemoizedTaskCard
                   key={task.id}
                   task={task}
                   isCompleted={false}
@@ -187,7 +197,7 @@ export default function QuadrantColumn({
                       className="space-y-2 mt-2 overflow-hidden"
                     >
                       {completed.map((task) => (
-                        <TaskCard
+                        <MemoizedTaskCard
                           key={task.id}
                           task={task}
                           isCompleted={true}

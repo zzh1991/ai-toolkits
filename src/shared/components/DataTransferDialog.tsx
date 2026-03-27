@@ -139,7 +139,7 @@ export default function DataTransferDialog({ isOpen, onClose }: DataTransferDial
             className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all ${
               activeTab === 'export'
                 ? 'bg-blue-500 text-white'
-                : 'text-white/50 hover:text-white/70'
+                : 'text-white/50 hover:text-white/70 hover:bg-white/[0.05]'
             }`}
           >
             <DownloadSimple weight="bold" className="w-4 h-4" />
@@ -149,8 +149,8 @@ export default function DataTransferDialog({ isOpen, onClose }: DataTransferDial
             onClick={() => setActiveTab('import')}
             className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all ${
               activeTab === 'import'
-                ? 'bg-emerald-500 text-[#0a0a0b]'
-                : 'text-white/50 hover:text-white/70'
+                ? 'bg-blue-500 text-white'
+                : 'text-white/50 hover:text-white/70 hover:bg-white/[0.05]'
             }`}
           >
             <UploadSimple weight="bold" className="w-4 h-4" />
@@ -214,7 +214,7 @@ export default function DataTransferDialog({ isOpen, onClose }: DataTransferDial
                   htmlFor="file-input"
                   className={`block p-6 rounded-2xl border-2 border-dashed cursor-pointer transition-all ${
                     selectedFile
-                      ? 'bg-emerald-500/10 border-emerald-500/30'
+                      ? 'bg-blue-500/10 border-blue-500/30'
                       : 'bg-white/[0.03] border-white/[0.08] hover:border-white/[0.15]'
                   }`}
                 >
@@ -229,11 +229,11 @@ export default function DataTransferDialog({ isOpen, onClose }: DataTransferDial
                   <div className="flex flex-col items-center text-center">
                     <div
                       className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-3 ${
-                        selectedFile ? 'bg-emerald-500/20' : 'bg-white/[0.05]'
+                        selectedFile ? 'bg-blue-500/20' : 'bg-white/[0.05]'
                       }`}
                     >
                       {selectedFile ? (
-                        <CheckCircle weight="bold" className="w-6 h-6 text-emerald-400" />
+                        <CheckCircle weight="bold" className="w-6 h-6 text-blue-400" />
                       ) : (
                         <UploadSimple weight="bold" className="w-6 h-6 text-white/40" />
                       )}
@@ -266,14 +266,14 @@ export default function DataTransferDialog({ isOpen, onClose }: DataTransferDial
                 <Button
                   onClick={handleImport}
                   disabled={!selectedFile || isImporting}
-                  className="w-full bg-emerald-500 hover:bg-emerald-400 text-[#0a0a0b] rounded-xl py-5 font-medium transition-all disabled:opacity-50"
+                  className="w-full bg-blue-500 hover:bg-blue-400 text-white rounded-xl py-5 font-medium transition-all disabled:opacity-50"
                 >
                   {isImporting ? (
                     <>
                       <motion.div
                         animate={{ rotate: 360 }}
                         transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                        className="w-4 h-4 border-2 border-[#0a0a0b]/30 border-t-[#0a0a0b] rounded-full mr-2"
+                        className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full mr-2"
                       />
                       导入中...
                     </>
@@ -292,8 +292,8 @@ export default function DataTransferDialog({ isOpen, onClose }: DataTransferDial
                 className="space-y-4"
               >
                 <div className="flex flex-col items-center py-4">
-                  <div className="w-16 h-16 rounded-full bg-emerald-500/20 flex items-center justify-center mb-4">
-                    <CheckCircle weight="bold" className="w-8 h-8 text-emerald-400" />
+                  <div className="w-16 h-16 rounded-full bg-blue-500/20 flex items-center justify-center mb-4">
+                    <CheckCircle weight="bold" className="w-8 h-8 text-blue-400" />
                   </div>
                   <h3 className="text-lg font-medium text-white mb-1">导入完成</h3>
                   <p className="text-sm text-white/40">重复的数据已自动跳过</p>
@@ -319,7 +319,7 @@ export default function DataTransferDialog({ isOpen, onClose }: DataTransferDial
 
                 <Button
                   onClick={handleClose}
-                  className="w-full bg-white/10 hover:bg-white/20 text-white rounded-xl py-5 font-medium transition-all"
+                  className="w-full bg-blue-500 hover:bg-blue-400 text-white rounded-xl py-5 font-medium transition-all"
                 >
                   完成
                 </Button>
@@ -345,7 +345,7 @@ function ResultRow({
     <div className="flex items-center justify-between p-3 rounded-xl bg-white/[0.03]">
       <span className="text-white/60">{label}</span>
       <div className="flex items-center gap-3 text-sm">
-        <span className="text-emerald-400">+{added} 新增</span>
+        <span className="text-blue-400">+{added} 新增</span>
         {skipped > 0 && <span className="text-white/30">{skipped} 跳过</span>}
       </div>
     </div>

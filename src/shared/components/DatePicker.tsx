@@ -1,5 +1,5 @@
 // src/shared/components/DatePicker.tsx
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   CalendarBlank,
@@ -143,24 +143,28 @@ export default function DatePicker({
     setIsOpen(false);
   }, [onChange]);
 
-  const days = getDaysInMonth(currentMonth);
+  const days = useMemo(() => getDaysInMonth(currentMonth), [currentMonth]);
   const year = currentMonth.getFullYear();
   const month = currentMonth.getMonth();
 
-  const isSelected = (day: number) => {
-    if (!value) return false;
+  // Memoize selected and today checks to avoid recalculation on every render
+  const selectedDay = useMemo(() => {
+    if (!value) return null;
     const [vYear, vMonth, vDay] = value.split('-').map(Number);
-    return vYear === year && vMonth === month + 1 && vDay === day;
-  };
+    if (vYear === year && vMonth === month + 1) return vDay;
+    return null;
+  }, [value, year, month]);
 
-  const isToday = (day: number) => {
+  const todayDay = useMemo(() => {
     const today = new Date();
-    return (
-      today.getFullYear() === year &&
-      today.getMonth() === month &&
-      today.getDate() === day
-    );
-  };
+    if (today.getFullYear() === year && today.getMonth() === month) {
+      return today.getDate();
+    }
+    return null;
+  }, [year, month]);
+
+  const isSelected = (day: number) => selectedDay === day;
+  const isToday = (day: number) => todayDay === day;
 
   const accentClasses = {
     blue: {
@@ -239,8 +243,9 @@ export default function DatePicker({
             exit={{ opacity: 0, y: -8, scale: 0.96 }}
             transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
             className={cn(
-              'absolute top-full left-0 mt-2 z-50',
-              'w-[280px] p-4 rounded-2xl',
+              'fixed inset-x-4 top-auto mt-2 z-[100]',
+              'sm:absolute sm:inset-x-auto sm:top-full sm:left-0 sm:w-[320px]',
+              'p-4 sm:p-5 rounded-2xl',
               'bg-[#1a1a1c] border border-white/[0.08]',
               'shadow-2xl shadow-black/40'
             )}
@@ -281,7 +286,7 @@ export default function DatePicker({
 
             {/* Calendar Grid */}
             <div className="grid grid-cols-7 gap-1">
-              {days.map((day, index) => (
+              {days.map((day: number | null, index: number) => (
                 <div key={index} className="aspect-square">
                   {day !== null && (
                     <button

@@ -189,28 +189,30 @@ export default function DateTimePicker({
     setIsOpen(false);
   }, [onChange]);
 
-  const days = getDaysInMonth(currentMonth);
+  const days = useMemo(() => getDaysInMonth(currentMonth), [currentMonth]);
   const year = currentMonth.getFullYear();
   const month = currentMonth.getMonth();
 
-  const isSelected = (day: number) => {
-    if (!value) return false;
+  // Memoize selected and today checks
+  const selectedDate = useMemo(() => {
+    if (!value) return null;
     const date = new Date(value);
-    return (
-      date.getFullYear() === year &&
-      date.getMonth() === month &&
-      date.getDate() === day
-    );
-  };
+    if (date.getFullYear() === year && date.getMonth() === month) {
+      return date.getDate();
+    }
+    return null;
+  }, [value, year, month]);
 
-  const isToday = (day: number) => {
+  const todayDay = useMemo(() => {
     const today = new Date();
-    return (
-      today.getFullYear() === year &&
-      today.getMonth() === month &&
-      today.getDate() === day
-    );
-  };
+    if (today.getFullYear() === year && today.getMonth() === month) {
+      return today.getDate();
+    }
+    return null;
+  }, [year, month]);
+
+  const isSelected = (day: number) => selectedDate === day;
+  const isToday = (day: number) => todayDay === day;
 
   const formattedValue = useMemo(() => {
     if (!value) return '';
@@ -304,8 +306,9 @@ export default function DateTimePicker({
             exit={{ opacity: 0, y: -8, scale: 0.96 }}
             transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
             className={cn(
-              'absolute top-full left-0 mt-2 z-50',
-              'w-[320px] rounded-2xl overflow-hidden',
+              'fixed inset-x-4 top-auto mt-2 z-[100]',
+              'sm:absolute sm:inset-x-auto sm:top-full sm:left-0 sm:w-[360px]',
+              'rounded-2xl overflow-hidden',
               'bg-[#1a1a1c] border border-white/[0.08]',
               'shadow-2xl shadow-black/40'
             )}

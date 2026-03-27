@@ -1,5 +1,5 @@
 // src/modules/kanban/components/TaskCard.tsx
-import { useState, useCallback } from 'react';
+import { memo, useState, useCallback } from 'react';
 import { format } from 'date-fns';
 import { zhCN } from 'date-fns/locale';
 import {
@@ -23,7 +23,7 @@ interface TaskCardProps {
   onDelete: (id: number) => void;
 }
 
-export default function TaskCard({
+export default memo(function TaskCard({
   task,
   isCompleted = false,
   onToggleComplete,
@@ -208,4 +208,4 @@ export default function TaskCard({
       </div>
     </motion.div>
   );
-}
+});

@@ -34,33 +34,42 @@ interface ActiveParkingProps {
   onEnd: () => void;
 }
 
-function ActiveParking({ parking, onStart, onEnd }: ActiveParkingProps) {
+// TimerDisplay component - isolated to minimize re-renders
+function TimerDisplay({ parking }: { parking: ParkingRecord }) {
   const [elapsedTime, setElapsedTime] = useState(0);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const rafRef = useRef<number | null>(null);
+  const lastUpdateRef = useRef(0);
 
   useEffect(() => {
-    if (!parking) {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-      return;
-    }
-
     const updateElapsed = () => {
-      setElapsedTime(getParkingDuration(parking));
+      const now = Date.now();
+      // Only update state every 500ms to reduce re-renders
+      if (now - lastUpdateRef.current >= 500) {
+        setElapsedTime(getParkingDuration(parking));
+        lastUpdateRef.current = now;
+      }
+      rafRef.current = requestAnimationFrame(updateElapsed);
     };
 
-    updateElapsed();
-    intervalRef.current = setInterval(updateElapsed, 1000);
+    // Initial update
+    setElapsedTime(getParkingDuration(parking));
+    rafRef.current = requestAnimationFrame(updateElapsed);
 
     return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
       }
     };
   }, [parking]);
 
+  return (
+    <p className="text-5xl sm:text-6xl font-semibold tabular-nums tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-400">
+      {formatDuration(elapsedTime)}
+    </p>
+  );
+}
+
+function ActiveParking({ parking, onStart, onEnd }: ActiveParkingProps) {
   if (!parking) {
     return (
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="relative">
@@ -127,9 +136,7 @@ function ActiveParking({ parking, onStart, onEnd }: ActiveParkingProps) {
         <CardContent className="space-y-8">
           <div className="text-center py-4">
             <p className="text-white/30 text-sm mb-3 uppercase tracking-wider">已停时长</p>
-            <p className="text-5xl sm:text-6xl font-semibold tabular-nums tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-400">
-              {formatDuration(elapsedTime)}
-            </p>
+            <TimerDisplay parking={parking} />
           </div>
           <Button
             size="lg"
