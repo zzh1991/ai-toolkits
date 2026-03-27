@@ -32,14 +32,6 @@ const staggerContainer = {
   },
 };
 
-// Optimized spring: lower stiffness for smoother, less CPU-intensive animation
-const springTransition = {
-  type: 'spring' as const,
-  stiffness: 80,
-  damping: 15,
-  mass: 0.8,
-};
-
 interface ToolCardProps {
   title: string;
   subtitle: string;
