@@ -1,7 +1,7 @@
 // src/shared/lib/utils.ts
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import { Solar, Lunar } from 'lunar-typescript';
+import { Lunar } from 'lunar-typescript';
 import { lunarToSolar } from './lunar';
 import type { Reminder } from '@/db/schema';
 
@@ -15,17 +15,26 @@ export function calculateDays(reminder: Reminder): number {
 
   let targetDate: Date;
 
-  if (reminder.dateType === 'lunar') {
-    targetDate = lunarToSolar(reminder.date);
-  } else {
-    const [year, month, day] = reminder.date.split('-').map(Number);
-    targetDate = new Date(year, month - 1, day);
+  try {
+    if (reminder.dateType === 'lunar') {
+      targetDate = lunarToSolar(reminder.date);
+    } else {
+      const [year, month, day] = reminder.date.split('-').map(Number);
+      targetDate = new Date(year, month - 1, day);
+    }
+  } catch {
+    // Invalid date (e.g., lunar 30th in a 29-day month)
+    return 0;
   }
 
   targetDate.setHours(0, 0, 0, 0);
 
   if (reminder.isRepeating) {
-    targetDate = getNextOccurrence(targetDate, today, reminder.dateType === 'lunar');
+    try {
+      targetDate = getNextOccurrence(targetDate, today, reminder.dateType === 'lunar', reminder.date);
+    } catch {
+      // If next occurrence fails, use the original target date
+    }
   }
 
   const diffTime = targetDate.getTime() - today.getTime();
@@ -34,24 +43,26 @@ export function calculateDays(reminder: Reminder): number {
   return diffDays;
 }
 
-function getNextOccurrence(targetDate: Date, today: Date, isLunar: boolean): Date {
+function getNextOccurrence(targetDate: Date, today: Date, isLunar: boolean, originalDateStr: string): Date {
   const currentYear = today.getFullYear();
 
   if (isLunar) {
-    // For lunar dates, we need to find the next lunar occurrence
-    const lunarDateStr = getLunarDateStringForYear(targetDate, currentYear);
+    // For lunar dates, the originalDateStr is "YYYY-MM-DD" in lunar calendar
+    // We need to use the SAME lunar month/day for the target year
+    const [, lunarMonth, lunarDay] = originalDateStr.split('-').map(Number);
+    const lunarDateStr = `${currentYear}-${String(lunarMonth).padStart(2, '0')}-${String(lunarDay).padStart(2, '0')}`;
     let nextDate = lunarToSolar(lunarDateStr);
 
     if (nextDate < today) {
       // Try next year
-      const nextYearLunarStr = getLunarDateStringForYear(targetDate, currentYear + 1);
+      const nextYearLunarStr = `${currentYear + 1}-${String(lunarMonth).padStart(2, '0')}-${String(lunarDay).padStart(2, '0')}`;
       nextDate = lunarToSolar(nextYearLunarStr);
     }
 
     return nextDate;
   } else {
-    // For solar dates
-    const [_, month, day] = targetDate.toISOString().split('T')[0].split('-').map(Number);
+    // For solar dates, use the same month/day every year
+    const [, month, day] = targetDate.toISOString().split('T')[0].split('-').map(Number);
     let nextDate = new Date(currentYear, month - 1, day);
 
     if (nextDate < today) {
@@ -60,18 +71,6 @@ function getNextOccurrence(targetDate: Date, today: Date, isLunar: boolean): Dat
 
     return nextDate;
   }
-}
-
-function getLunarDateStringForYear(originalDate: Date, year: number): string {
-  // Convert the original solar date to lunar to get month/day
-  const originalSolar = Solar.fromYmd(
-    originalDate.getFullYear(),
-    originalDate.getMonth() + 1,
-    originalDate.getDate()
-  );
-  const lunar = originalSolar.getLunar();
-  // Return the lunar date string for the target year
-  return `${year}-${String(lunar.getMonth()).padStart(2, '0')}-${String(lunar.getDay()).padStart(2, '0')}`;
 }
 
 export function formatDateDisplay(dateStr: string, dateType: 'solar' | 'lunar'): string {
