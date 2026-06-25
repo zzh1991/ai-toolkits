@@ -104,7 +104,7 @@ export default memo(function ReminderCard({ reminder, onEdit, onDelete }: Remind
           {/* Days count - Using t-digit-group for pop-in animation */}
           <div className="flex flex-col items-center justify-center min-w-[60px] sm:min-w-[80px]">
             <span
-              className="t-digit-group text-2xl sm:text-4xl font-semibold tracking-tight tabular-nums"
+              className="t-digit-group is-animating text-2xl sm:text-4xl font-semibold tracking-tight tabular-nums"
               style={{
                 background: `linear-gradient(135deg, ${theme.from} 0%, ${theme.to} 100%)`,
                 WebkitBackgroundClip: 'text',
@@ -115,7 +115,7 @@ export default memo(function ReminderCard({ reminder, onEdit, onDelete }: Remind
               {digits.map((digit, i) => (
                 <span
                   key={`${reminder.id}-${i}`}
-                  className="t-digit is-animating"
+                  className="t-digit"
                   data-stagger={digitCount - i <= 2 ? String(digitCount - i) : undefined}
                 >
                   {digit}
