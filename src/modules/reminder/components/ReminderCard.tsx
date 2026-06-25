@@ -1,5 +1,5 @@
 // src/modules/reminder/components/ReminderCard.tsx
-import { memo, useEffect, useRef, useState } from 'react';
+import { memo, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { PencilSimple, Trash } from '@phosphor-icons/react';
 import { cn, formatDateDisplay } from '@/shared/lib/utils';
@@ -13,17 +13,6 @@ export default memo(function ReminderCard({ reminder, onEdit, onDelete }: Remind
   const daysCount = Math.abs(reminder.days);
   const daysLabel = isPast ? '已过' : '还剩';
   const tiltRef = useRef<HTMLDivElement>(null);
-  const [isAnimating, setIsAnimating] = useState(false);
-
-  // Convert daysCount to string and create digit spans for pop-in animation
-  const digits = String(daysCount).split('');
-  const digitCount = digits.length;
-
-  // Trigger animation after mount
-  useEffect(() => {
-    const timer = setTimeout(() => setIsAnimating(true), 50);
-    return () => clearTimeout(timer);
-  }, [daysCount]);
 
   // Card tilt effect
   useEffect(() => {
@@ -108,13 +97,10 @@ export default memo(function ReminderCard({ reminder, onEdit, onDelete }: Remind
         />
 
         <div className="relative flex items-center gap-3 sm:gap-6">
-          {/* Days count - Using t-digit-group for pop-in animation */}
+          {/* Days count */}
           <div className="flex flex-col items-center justify-center min-w-[60px] sm:min-w-[80px]">
             <span
-              className={cn(
-                't-digit-group text-2xl sm:text-4xl font-semibold tracking-tight tabular-nums',
-                isAnimating && 'is-animating'
-              )}
+              className="text-2xl sm:text-4xl font-semibold tracking-tight tabular-nums transition-transform duration-300"
               style={{
                 background: `linear-gradient(135deg, ${theme.from} 0%, ${theme.to} 100%)`,
                 WebkitBackgroundClip: 'text',
@@ -122,15 +108,7 @@ export default memo(function ReminderCard({ reminder, onEdit, onDelete }: Remind
                 willChange: 'transform',
               }}
             >
-              {digits.map((digit, i) => (
-                <span
-                  key={`${reminder.id}-${i}`}
-                  className="t-digit"
-                  data-stagger={digitCount - i <= 2 ? String(digitCount - i) : undefined}
-                >
-                  {digit}
-                </span>
-              ))}
+              {daysCount}
             </span>
             <span className="text-xs text-white/40 mt-0.5 sm:mt-1">天</span>
           </div>
