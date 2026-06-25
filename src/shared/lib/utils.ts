@@ -50,19 +50,25 @@ function getNextOccurrence(targetDate: Date, today: Date, isLunar: boolean, orig
     // For lunar dates, the originalDateStr is "YYYY-MM-DD" in lunar calendar
     // We need to use the SAME lunar month/day for the target year
     const [, lunarMonth, lunarDay] = originalDateStr.split('-').map(Number);
-    const lunarDateStr = `${currentYear}-${String(lunarMonth).padStart(2, '0')}-${String(lunarDay).padStart(2, '0')}`;
-    let nextDate = lunarToSolar(lunarDateStr);
 
-    if (nextDate < today) {
-      // Try next year
-      const nextYearLunarStr = `${currentYear + 1}-${String(lunarMonth).padStart(2, '0')}-${String(lunarDay).padStart(2, '0')}`;
-      nextDate = lunarToSolar(nextYearLunarStr);
+    // Try current year first
+    let nextDate = safeLunarToSolar(currentYear, lunarMonth, lunarDay);
+
+    // If invalid or already passed, try next year
+    if (!nextDate || nextDate < today) {
+      nextDate = safeLunarToSolar(currentYear + 1, lunarMonth, lunarDay);
     }
 
-    return nextDate;
+    // If still invalid, try year after next
+    if (!nextDate || nextDate < today) {
+      nextDate = safeLunarToSolar(currentYear + 2, lunarMonth, lunarDay);
+    }
+
+    return nextDate || targetDate;
   } else {
     // For solar dates, use the same month/day every year
-    const [, month, day] = targetDate.toISOString().split('T')[0].split('-').map(Number);
+    const month = targetDate.getMonth() + 1; // local month (1-12)
+    const day = targetDate.getDate();        // local day
     let nextDate = new Date(currentYear, month - 1, day);
 
     if (nextDate < today) {
@@ -70,6 +76,23 @@ function getNextOccurrence(targetDate: Date, today: Date, isLunar: boolean, orig
     }
 
     return nextDate;
+  }
+}
+
+/**
+ * Safely convert a lunar date to solar date.
+ * Returns null if the lunar date is invalid (e.g. day 30 in a 29-day month).
+ */
+function safeLunarToSolar(year: number, month: number, day: number): Date | null {
+  try {
+    const lunar = Lunar.fromYmd(year, month, day);
+    if (!lunar) return null;
+    const solar = lunar.getSolar();
+    if (!solar) return null;
+    const result = new Date(solar.getYear(), solar.getMonth() - 1, solar.getDay());
+    return isNaN(result.getTime()) ? null : result;
+  } catch {
+    return null;
   }
 }
 
