@@ -157,6 +157,7 @@ export default function ReminderForm({ reminder, onSubmit, onCancel }: ReminderF
               onChange={(value) => updateField('date', value)}
               placeholder="选择日期"
               accentColor="blue"
+              dateType={formData.dateType}
             />
             <AnimatePresence>
               {errors.date && (
