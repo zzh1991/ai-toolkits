@@ -13,7 +13,7 @@ import {
 import { Checkbox } from '@/shared/components/ui/checkbox';
 import { Button } from '@/shared/components/ui/button';
 import type { Task } from '@/db/schema';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 interface TaskCardProps {
   task: Task;
@@ -126,82 +126,72 @@ export default memo(function TaskCard({
               ) : null}
             </div>
 
-            {/* Expandable details */}
+            {/* Expandable details - Using t-acc accordion transition */}
             {task.note && (
-              <div className="mt-3">
+              <div className="t-acc mt-3" data-open={showDetails}>
                 <button
                   onClick={() => setShowDetails(!showDetails)}
-                  className="flex items-center gap-1 text-xs text-white/30 hover:text-white/50 transition-colors py-1"
+                  className="t-acc-head flex items-center gap-1 text-xs text-white/30 hover:text-white/50 transition-colors py-1"
+                  aria-expanded={showDetails}
                 >
-                  {showDetails ? (
-                    <>
-                      <CaretUp weight="bold" className="h-3 w-3" />
-                      收起详情
-                    </>
-                  ) : (
-                    <>
+                  <span className="t-icon-swap" data-state={showDetails ? 'b' : 'a'}>
+                    <span className="t-icon" data-icon="a">
                       <CaretDown weight="bold" className="h-3 w-3" />
-                      查看备注
-                    </>
-                  )}
+                    </span>
+                    <span className="t-icon" data-icon="b">
+                      <CaretUp weight="bold" className="h-3 w-3" />
+                    </span>
+                  </span>
+                  {showDetails ? '收起详情' : '查看备注'}
                 </button>
-                <AnimatePresence initial={false}>
-                  {showDetails && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
-                      exit={{ opacity: 0, height: 0 }}
-                      transition={{
-                        duration: 0.2,
-                        ease: [0.16, 1, 0.3, 1],
-                      }}
-                      style={{ willChange: 'height, opacity' }}
-                      className="mt-2 text-xs text-white/60 bg-white/[0.03] rounded-lg p-3 border border-white/[0.06] overflow-hidden"
-                    >
-                      <p className="whitespace-pre-wrap leading-relaxed">{task.note}</p>
-                      <p className="mt-3 text-white/30">创建于 {formatFullDate(task.createdAt)}</p>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                <div className="t-acc-panel">
+                  <div className="t-acc-panel-inner mt-2 text-xs text-white/60 bg-white/[0.03] rounded-lg p-3 border border-white/[0.06]">
+                    <p className="whitespace-pre-wrap leading-relaxed">{task.note}</p>
+                    <p className="mt-3 text-white/30">创建于 {formatFullDate(task.createdAt)}</p>
+                  </div>
+                </div>
               </div>
             )}
 
-            {/* Show created time if no note */}
+            {/* Show created time if no note - Using t-acc accordion transition */}
             {!task.note && (
-              <AnimatePresence initial={false}>
-                {showDetails && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{ opacity: 0, height: 0 }}
-                    transition={{
-                      duration: 0.2,
-                      ease: [0.16, 1, 0.3, 1],
-                    }}
-                    style={{ willChange: 'height, opacity' }}
-                    className="mt-2 overflow-hidden"
-                  >
+              <div className="t-acc mt-2" data-open={showDetails}>
+                <div className="t-acc-panel">
+                  <div className="t-acc-panel-inner overflow-hidden">
                     <button
                       onClick={() => setShowDetails(false)}
                       className="flex items-center gap-1 text-xs text-white/30 hover:text-white/50 transition-colors py-1"
                     >
-                      <CaretUp weight="bold" className="h-3 w-3" />
+                      <span className="t-icon-swap" data-state={showDetails ? 'b' : 'a'}>
+                        <span className="t-icon" data-icon="a">
+                          <CaretDown weight="bold" className="h-3 w-3" />
+                        </span>
+                        <span className="t-icon" data-icon="b">
+                          <CaretUp weight="bold" className="h-3 w-3" />
+                        </span>
+                      </span>
                       收起
                     </button>
                     <p className="mt-2 text-xs text-white/25">创建于 {formatFullDate(task.createdAt)}</p>
-                  </motion.div>
+                  </div>
+                </div>
+                {!showDetails && (
+                  <button
+                    onClick={() => setShowDetails(true)}
+                    className="flex items-center gap-1 mt-2 text-xs text-white/30 hover:text-white/50 transition-colors"
+                  >
+                    <span className="t-icon-swap" data-state={showDetails ? 'b' : 'a'}>
+                      <span className="t-icon" data-icon="a">
+                        <CaretDown weight="bold" className="h-3 w-3" />
+                      </span>
+                      <span className="t-icon" data-icon="b">
+                        <CaretUp weight="bold" className="h-3 w-3" />
+                      </span>
+                    </span>
+                    查看详情
+                  </button>
                 )}
-              </AnimatePresence>
-            )}
-
-            {!task.note && !showDetails && (
-              <button
-                onClick={() => setShowDetails(true)}
-                className="flex items-center gap-1 mt-2 text-xs text-white/30 hover:text-white/50 transition-colors"
-              >
-                <CaretDown weight="bold" className="h-3 w-3" />
-                查看详情
-              </button>
+              </div>
             )}
           </div>
         </div>

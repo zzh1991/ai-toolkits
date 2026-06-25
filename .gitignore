@@ -28,3 +28,6 @@ md
 CLAUDE.md
 CLAUDE-*.md
 .playwright
+.agents
+.playwright-cli
+skills-lock.json

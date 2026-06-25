@@ -1,5 +1,5 @@
 // src/routes/landing/LandingPage.tsx
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -44,6 +44,50 @@ interface ToolCardProps {
 
 function ToolCard({ title, subtitle, description, to, icon, gradient, index }: ToolCardProps) {
   const isEven = index % 2 === 0;
+  const cardRef = useRef<HTMLDivElement>(null);
+  const tiltRef = useRef<HTMLDivElement>(null);
+
+  // Card tilt effect
+  useEffect(() => {
+    const tilt = tiltRef.current;
+    const card = cardRef.current;
+    if (!tilt || !card) return;
+
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+    const MAX = 14; // peak tilt in degrees
+
+    function reset() {
+      if (!tilt || !card) return;
+      tilt.classList.remove('is-hover');
+      card.classList.remove('is-tilting');
+      card.style.setProperty('--tilt-rx', '0deg');
+      card.style.setProperty('--tilt-ry', '0deg');
+    }
+
+    function track(e: PointerEvent) {
+      if (!tilt || !card) return;
+      if (reduce.matches) return;
+      const r = tilt.getBoundingClientRect();
+      const px = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
+      const py = Math.min(1, Math.max(0, (e.clientY - r.top) / r.height));
+      tilt.classList.add('is-hover');
+      card.classList.add('is-tilting');
+      card.style.setProperty('--tilt-ry', `${(px - 0.5) * MAX}deg`);
+      card.style.setProperty('--tilt-rx', `${(0.5 - py) * MAX}deg`);
+      card.style.setProperty('--tilt-gx', `${px * 100}%`);
+      card.style.setProperty('--tilt-gy', `${py * 100}%`);
+    }
+
+    tilt.addEventListener('pointermove', track);
+    tilt.addEventListener('pointerleave', () => {
+      reset();
+    });
+
+    return () => {
+      tilt.removeEventListener('pointermove', track);
+      tilt.removeEventListener('pointerleave', reset);
+    };
+  }, []);
 
   return (
     <motion.div
@@ -56,13 +100,16 @@ function ToolCard({ title, subtitle, description, to, icon, gradient, index }: T
         delay: index * 0.08
       }}
       style={{ willChange: 'transform, opacity' }}
-      className="group relative"
+      className="group relative t-tilt"
+      ref={tiltRef}
     >
       <div
-        className={`relative overflow-hidden rounded-3xl bg-[#141416] border border-white/[0.06] transition-all duration-500 hover:border-white/[0.12] hover:shadow-2xl hover:shadow-black/40 ${
+        ref={cardRef}
+        className={`t-tilt-card relative overflow-hidden rounded-3xl bg-[#141416] border border-white/[0.06] transition-all duration-500 hover:border-white/[0.12] hover:shadow-2xl hover:shadow-black/40 ${
           isEven ? '' : ''
         }`}
       >
+        <div className="t-tilt-glare" />
         <div className="absolute inset-0 bg-gradient-to-br from-white/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
         <div className={`flex flex-col lg:flex-row ${isEven ? '' : 'lg:flex-row-reverse'}`}>

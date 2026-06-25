@@ -1,5 +1,5 @@
 // src/modules/reminder/components/ReminderCard.tsx
-import { memo } from 'react';
+import { memo, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { PencilSimple, Trash } from '@phosphor-icons/react';
 import { cn, formatDateDisplay } from '@/shared/lib/utils';
@@ -12,6 +12,53 @@ export default memo(function ReminderCard({ reminder, onEdit, onDelete }: Remind
   const isPast = reminder.days < 0;
   const daysCount = Math.abs(reminder.days);
   const daysLabel = isPast ? '已过' : '还剩';
+  const tiltRef = useRef<HTMLDivElement>(null);
+
+  // Convert daysCount to string and create digit spans for pop-in animation
+  const digits = String(daysCount).split('');
+  const digitCount = digits.length;
+
+  // Card tilt effect
+  useEffect(() => {
+    const tilt = tiltRef.current;
+    if (!tilt) return;
+
+    const card = tilt.querySelector('.t-tilt-card') as HTMLElement | null;
+    if (!card) return;
+
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+    const MAX = 12; // peak tilt in degrees (slightly less for smaller cards)
+
+    function reset() {
+      if (!tilt || !card) return;
+      tilt.classList.remove('is-hover');
+      card.classList.remove('is-tilting');
+      card.style.setProperty('--tilt-rx', '0deg');
+      card.style.setProperty('--tilt-ry', '0deg');
+    }
+
+    function track(e: PointerEvent) {
+      if (!tilt || !card) return;
+      if (reduce.matches) return;
+      const r = tilt.getBoundingClientRect();
+      const px = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
+      const py = Math.min(1, Math.max(0, (e.clientY - r.top) / r.height));
+      tilt.classList.add('is-hover');
+      card.classList.add('is-tilting');
+      card.style.setProperty('--tilt-ry', `${(px - 0.5) * MAX}deg`);
+      card.style.setProperty('--tilt-rx', `${(0.5 - py) * MAX}deg`);
+      card.style.setProperty('--tilt-gx', `${px * 100}%`);
+      card.style.setProperty('--tilt-gy', `${py * 100}%`);
+    }
+
+    tilt.addEventListener('pointermove', track);
+    tilt.addEventListener('pointerleave', reset);
+
+    return () => {
+      tilt.removeEventListener('pointermove', track);
+      tilt.removeEventListener('pointerleave', reset);
+    };
+  }, []);
 
   return (
     <motion.div
@@ -25,13 +72,16 @@ export default memo(function ReminderCard({ reminder, onEdit, onDelete }: Remind
       style={{
         willChange: 'transform, opacity',
       }}
+      ref={tiltRef}
       className={cn(
-        'group relative overflow-hidden rounded-2xl sm:rounded-3xl p-4 sm:p-6',
+        't-tilt group relative overflow-hidden rounded-2xl sm:rounded-3xl p-4 sm:p-6',
         'bg-[#141416] border border-white/[0.06]',
         'transition-all duration-300',
         'hover:border-white/[0.12] hover:shadow-lg hover:shadow-black/20'
       )}
     >
+      <div className="t-tilt-card">
+        <div className="t-tilt-glare" />
       {/* Color accent bar */}
       <div
         className="absolute left-0 top-0 h-full w-1 sm:w-1.5"
@@ -49,10 +99,10 @@ export default memo(function ReminderCard({ reminder, onEdit, onDelete }: Remind
       />
 
       <div className="relative flex items-center gap-3 sm:gap-6">
-        {/* Days count */}
+        {/* Days count - Using t-digit-group for pop-in animation */}
         <div className="flex flex-col items-center justify-center min-w-[60px] sm:min-w-[80px]">
           <span
-            className="text-2xl sm:text-4xl font-semibold tracking-tight tabular-nums transition-transform duration-300"
+            className="t-digit-group text-2xl sm:text-4xl font-semibold tracking-tight tabular-nums"
             style={{
               background: `linear-gradient(135deg, ${theme.from} 0%, ${theme.to} 100%)`,
               WebkitBackgroundClip: 'text',
@@ -60,7 +110,15 @@ export default memo(function ReminderCard({ reminder, onEdit, onDelete }: Remind
               willChange: 'transform',
             }}
           >
-            {daysCount}
+            {digits.map((digit, i) => (
+              <span
+                key={`${reminder.id}-${i}`}
+                className="t-digit is-animating"
+                data-stagger={digitCount - i <= 2 ? String(digitCount - i) : undefined}
+              >
+                {digit}
+              </span>
+            ))}
           </span>
           <span className="text-xs text-white/40 mt-0.5 sm:mt-1">天</span>
         </div>
@@ -112,6 +170,7 @@ export default memo(function ReminderCard({ reminder, onEdit, onDelete }: Remind
             <Trash weight="bold" className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </button>
         </div>
+      </div>
       </div>
     </motion.div>
   );

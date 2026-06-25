@@ -1,5 +1,5 @@
 // src/shared/components/DataTransferDialog.tsx
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { X, DownloadSimple, UploadSimple, CheckCircle, Warning, FileArrowDown } from '@phosphor-icons/react';
 import { Button } from '@/shared/components/ui/button';
@@ -18,6 +18,65 @@ interface DataTransferDialogProps {
 
 type TabType = 'export' | 'import';
 
+// Tabs sliding animation helper
+function useTabsAnimation(activeTab: TabType) {
+  const tabsRef = useRef<HTMLDivElement>(null);
+  const pillRef = useRef<HTMLSpanElement>(null);
+  const hasInitialized = useRef(false);
+
+  useEffect(() => {
+    const bar = tabsRef.current;
+    const pill = pillRef.current;
+    if (!bar || !pill) return;
+
+    const tabs = Array.from(bar.querySelectorAll('.t-tab')) as HTMLButtonElement[];
+    const activeTabEl = tabs.find((t) => t.getAttribute('aria-selected') === 'true') || tabs[0];
+
+    if (!hasInitialized.current) {
+      // First paint: snap without animation
+      pill.style.transition = 'none';
+      pill.style.transform = `translateX(${activeTabEl.offsetLeft}px)`;
+      pill.style.width = `${activeTabEl.offsetWidth}px`;
+      // Force reflow
+      void pill.offsetWidth;
+      pill.style.transition = '';
+      hasInitialized.current = true;
+    } else {
+      // Subsequent: animate
+      pill.style.transform = `translateX(${activeTabEl.offsetLeft}px)`;
+      pill.style.width = `${activeTabEl.offsetWidth}px`;
+    }
+  }, [activeTab]);
+
+  // Handle resize: snap to position
+  useEffect(() => {
+    const handleResize = () => {
+      const bar = tabsRef.current;
+      const pill = pillRef.current;
+      if (!bar || !pill) return;
+
+      const tabs = Array.from(bar.querySelectorAll('.t-tab')) as HTMLButtonElement[];
+      const activeTabEl = tabs.find((t) => t.getAttribute('aria-selected') === 'true') || tabs[0];
+
+      pill.style.transition = 'none';
+      pill.style.transform = `translateX(${activeTabEl.offsetLeft}px)`;
+      pill.style.width = `${activeTabEl.offsetWidth}px`;
+      void pill.offsetWidth;
+      pill.style.transition = '';
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  return { tabsRef, pillRef };
+}
+
+interface DataTransferDialogProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
 export default function DataTransferDialog({ isOpen, onClose }: DataTransferDialogProps) {
   const [activeTab, setActiveTab] = useState<TabType>('export');
   const [isExporting, setIsExporting] = useState(false);
@@ -26,6 +85,8 @@ export default function DataTransferDialog({ isOpen, onClose }: DataTransferDial
   const [error, setError] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const { tabsRef, pillRef } = useTabsAnimation(activeTab);
 
   const handleExport = useCallback(async () => {
     setIsExporting(true);
@@ -115,11 +176,11 @@ export default function DataTransferDialog({ isOpen, onClose }: DataTransferDial
 
       {/* Dialog */}
       <motion.div
-        initial={{ opacity: 0, scale: 0.96, y: 16 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.96, y: 16 }}
-        transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-        className="relative w-full max-w-md rounded-3xl bg-[#141416] border border-white/[0.08] p-6 shadow-2xl shadow-black/50"
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: 16 }}
+        transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+        className="t-modal is-open relative w-full max-w-md rounded-3xl bg-[#141416] border border-white/[0.08] p-6 shadow-2xl shadow-black/50"
       >
         {/* Close button */}
         <button
@@ -132,26 +193,23 @@ export default function DataTransferDialog({ isOpen, onClose }: DataTransferDial
         {/* Title */}
         <h2 className="text-xl font-semibold text-white mb-6">数据管理</h2>
 
-        {/* Tabs */}
-        <div className="flex gap-2 p-1 rounded-xl bg-white/[0.03] mb-6">
+        {/* Tabs - Using t-tabs sliding transition */}
+        <div ref={tabsRef} className="t-tabs w-full mb-6" role="tablist">
+          <span ref={pillRef} className="t-tabs-pill" aria-hidden="true"></span>
           <button
+            className="t-tab flex-1 flex items-center justify-center gap-2"
+            role="tab"
+            aria-selected={activeTab === 'export'}
             onClick={() => setActiveTab('export')}
-            className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all ${
-              activeTab === 'export'
-                ? 'bg-blue-500 text-white'
-                : 'text-white/50 hover:text-white/70 hover:bg-white/[0.05]'
-            }`}
           >
             <DownloadSimple weight="bold" className="w-4 h-4" />
             导出数据
           </button>
           <button
+            className="t-tab flex-1 flex items-center justify-center gap-2"
+            role="tab"
+            aria-selected={activeTab === 'import'}
             onClick={() => setActiveTab('import')}
-            className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all ${
-              activeTab === 'import'
-                ? 'bg-blue-500 text-white'
-                : 'text-white/50 hover:text-white/70 hover:bg-white/[0.05]'
-            }`}
           >
             <UploadSimple weight="bold" className="w-4 h-4" />
             导入数据
@@ -293,7 +351,19 @@ export default function DataTransferDialog({ isOpen, onClose }: DataTransferDial
               >
                 <div className="flex flex-col items-center py-4">
                   <div className="w-16 h-16 rounded-full bg-blue-500/20 flex items-center justify-center mb-4">
-                    <CheckCircle weight="bold" className="w-8 h-8 text-blue-400" />
+                    <span className="t-success-check" data-state="in" aria-hidden="true">
+                      <svg viewBox="0 0 48 48" fill="none" className="w-8 h-8">
+                        <circle cx="24" cy="24" r="20" stroke="currentColor" strokeWidth="2" className="text-blue-400/30" />
+                        <path
+                          d="M14 24L21 31L34 18"
+                          stroke="currentColor"
+                          strokeWidth="3"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="text-blue-400"
+                        />
+                      </svg>
+                    </span>
                   </div>
                   <h3 className="text-lg font-medium text-white mb-1">导入完成</h3>
                   <p className="text-sm text-white/40">重复的数据已自动跳过</p>
