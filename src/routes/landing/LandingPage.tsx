@@ -13,6 +13,7 @@ import {
   Car,
   Database,
   Coin,
+  GraduationCap,
 } from '@phosphor-icons/react';
 import { Button } from '@/shared/components/ui/button';
 import DataTransferDialog from '@/shared/components/DataTransferDialog';
@@ -221,6 +222,15 @@ export default function LandingPage() {
       icon: <Coin weight="fill" className="w-4 h-4" />,
       gradient: 'from-amber-400 to-yellow-500',
     },
+    {
+      title: '英语词汇',
+      subtitle: '幼儿英语',
+      description:
+        '从幼儿园到小学的常见英语词汇学习工具，支持中英文搜索、同义词关联和在线发音，帮助孩子轻松掌握英语单词。',
+      to: '/vocab',
+      icon: <GraduationCap weight="fill" className="w-4 h-4" />,
+      gradient: 'from-purple-500 to-violet-600',
+    },
   ];
 
   return (
@@ -249,6 +259,7 @@ export default function LandingPage() {
                   { label: '任务看板', to: '/kanban' },
                   { label: '停车计时', to: '/parking' },
                   { label: '黄金价格', to: '/gold' },
+                  { label: '英语词汇', to: '/vocab' },
                 ].map((item) => (
                   <Link
                     key={item.to}
@@ -470,7 +481,7 @@ export default function LandingPage() {
               工具箱
             </h2>
             <p className="text-white/40 text-lg max-w-md">
-              四个精心设计的效率工具，助你掌控每一天
+              五个精心设计的效率工具，助你掌控每一天
             </p>
           </motion.div>
 
@@ -532,6 +543,15 @@ export default function LandingPage() {
                   className="rounded-full px-6 py-5 text-sm font-medium border-white/10 text-white/70 hover:text-white hover:bg-white/5 hover:border-white/20 transition-all duration-300"
                 >
                   黄金价格
+                </Button>
+              </Link>
+              <Link to="/vocab">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="rounded-full px-6 py-5 text-sm font-medium border-white/10 text-white/70 hover:text-white hover:bg-white/5 hover:border-white/20 transition-all duration-300"
+                >
+                  英语词汇
                 </Button>
               </Link>
             </div>

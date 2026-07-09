@@ -5,6 +5,7 @@ import ReminderPage from '@/routes/reminder';
 import KanbanPage from '@/routes/kanban';
 import ParkingPage from '@/routes/parking';
 import GoldPage from '@/routes/gold';
+import VocabPage from '@/routes/vocab';
 
 export const router = createBrowserRouter([
   {
@@ -26,5 +27,9 @@ export const router = createBrowserRouter([
   {
     path: '/gold',
     element: <GoldPage />,
+  },
+  {
+    path: '/vocab',
+    element: <VocabPage />,
   },
 ]);
