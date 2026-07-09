@@ -12,6 +12,7 @@ import {
   CalendarHeart,
   Car,
   Database,
+  Coin,
 } from '@phosphor-icons/react';
 import { Button } from '@/shared/components/ui/button';
 import DataTransferDialog from '@/shared/components/DataTransferDialog';
@@ -211,6 +212,15 @@ export default function LandingPage() {
       icon: <Car weight="fill" className="w-4 h-4" />,
       gradient: 'from-amber-500 to-orange-600',
     },
+    {
+      title: '黄金价格',
+      subtitle: '实时金价',
+      description:
+        '实时追踪黄金价格，查看近期走势，基于技术指标给出买入建议。数据来自 CoinGecko，以元/克为单位呈现。',
+      to: '/gold',
+      icon: <Coin weight="fill" className="w-4 h-4" />,
+      gradient: 'from-amber-400 to-yellow-500',
+    },
   ];
 
   return (
@@ -238,6 +248,7 @@ export default function LandingPage() {
                   { label: '倒数日', to: '/reminder' },
                   { label: '任务看板', to: '/kanban' },
                   { label: '停车计时', to: '/parking' },
+                  { label: '黄金价格', to: '/gold' },
                 ].map((item) => (
                   <Link
                     key={item.to}
@@ -459,7 +470,7 @@ export default function LandingPage() {
               工具箱
             </h2>
             <p className="text-white/40 text-lg max-w-md">
-              三个精心设计的效率工具，助你掌控每一天
+              四个精心设计的效率工具，助你掌控每一天
             </p>
           </motion.div>
 
@@ -512,6 +523,15 @@ export default function LandingPage() {
                   className="rounded-full px-6 py-5 text-sm font-medium border-white/10 text-white/70 hover:text-white hover:bg-white/5 hover:border-white/20 transition-all duration-300"
                 >
                   停车计时
+                </Button>
+              </Link>
+              <Link to="/gold">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="rounded-full px-6 py-5 text-sm font-medium border-white/10 text-white/70 hover:text-white hover:bg-white/5 hover:border-white/20 transition-all duration-300"
+                >
+                  黄金价格
                 </Button>
               </Link>
             </div>

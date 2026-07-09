@@ -4,6 +4,7 @@ import LandingPage from '@/routes/landing';
 import ReminderPage from '@/routes/reminder';
 import KanbanPage from '@/routes/kanban';
 import ParkingPage from '@/routes/parking';
+import GoldPage from '@/routes/gold';
 
 export const router = createBrowserRouter([
   {
@@ -21,5 +22,9 @@ export const router = createBrowserRouter([
   {
     path: '/parking',
     element: <ParkingPage />,
+  },
+  {
+    path: '/gold',
+    element: <GoldPage />,
   },
 ]);

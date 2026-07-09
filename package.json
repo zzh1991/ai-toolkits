@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "update-gold": "node scripts/update-gold-data.cjs"
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.10",
@@ -28,6 +29,7 @@
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-router": "^7.13.1",
+    "recharts": "^3.9.2",
     "tailwind-merge": "^3.5.0",
     "zustand": "^5.0.12"
   },
