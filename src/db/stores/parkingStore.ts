@@ -44,6 +44,15 @@ export async function endParking(id: number): Promise<void> {
   });
 }
 
+// 修改停车开始时间
+export async function updateParkingStartTime(id: number, startTime: Date): Promise<void> {
+  if (Number.isNaN(startTime.getTime()) || startTime.getTime() > Date.now()) {
+    throw new Error('停车开始时间不能晚于当前时间');
+  }
+
+  await db.parkingRecords.update(id, { startTime });
+}
+
 // 删除单条停车记录
 export async function deleteParkingRecord(id: number): Promise<void> {
   await db.parkingRecords.delete(id);
@@ -58,7 +67,7 @@ export async function clearParkingHistory(): Promise<void> {
 // 获取停车时长（毫秒）
 export function getParkingDuration(record: ParkingRecord): number {
   const endTime = record.endTime || new Date();
-  return endTime.getTime() - record.startTime.getTime();
+  return Math.max(0, endTime.getTime() - record.startTime.getTime());
 }
 
 // 格式化停车时长

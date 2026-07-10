@@ -14,6 +14,7 @@ import {
   formatDateTime,
   getParkingDuration,
   deleteParkingRecord,
+  updateParkingStartTime,
 } from '@/db/stores/parkingStore';
 import type { ParkingRecord } from '@/db/schema';
 import {
@@ -26,17 +27,26 @@ import {
   Square,
   Car,
   Calendar,
+  PencilSimple,
+  Check,
+  X,
 } from '@phosphor-icons/react';
 
 interface ActiveParkingProps {
   parking: ParkingRecord | null;
   onStart: () => void;
   onEnd: () => void;
+  onUpdateStart: (startTime: Date) => Promise<void>;
+}
+
+function formatDateTimeInput(date: Date): string {
+  const offset = date.getTimezoneOffset() * 60_000;
+  return new Date(date.getTime() - offset).toISOString().slice(0, 16);
 }
 
 // TimerDisplay component - isolated to minimize re-renders
 function TimerDisplay({ parking }: { parking: ParkingRecord }) {
-  const [elapsedTime, setElapsedTime] = useState(0);
+  const [elapsedTime, setElapsedTime] = useState(() => getParkingDuration(parking));
   const rafRef = useRef<number | null>(null);
   const lastUpdateRef = useRef(0);
 
@@ -51,8 +61,6 @@ function TimerDisplay({ parking }: { parking: ParkingRecord }) {
       rafRef.current = requestAnimationFrame(updateElapsed);
     };
 
-    // Initial update
-    setElapsedTime(getParkingDuration(parking));
     rafRef.current = requestAnimationFrame(updateElapsed);
 
     return () => {
@@ -69,7 +77,51 @@ function TimerDisplay({ parking }: { parking: ParkingRecord }) {
   );
 }
 
-function ActiveParking({ parking, onStart, onEnd }: ActiveParkingProps) {
+function ActiveParking({ parking, onStart, onEnd, onUpdateStart }: ActiveParkingProps) {
+  const [isEditingStart, setIsEditingStart] = useState(false);
+  const [startTimeValue, setStartTimeValue] = useState('');
+  const [editError, setEditError] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    if (parking) {
+      setStartTimeValue(formatDateTimeInput(parking.startTime));
+    }
+  }, [parking]);
+
+  const handleSaveStartTime = useCallback(async () => {
+    const nextStartTime = new Date(startTimeValue);
+
+    if (!startTimeValue || Number.isNaN(nextStartTime.getTime())) {
+      setEditError('请选择有效的开始时间');
+      return;
+    }
+
+    if (nextStartTime.getTime() > Date.now()) {
+      setEditError('开始时间不能晚于当前时间');
+      return;
+    }
+
+    setIsSaving(true);
+    setEditError('');
+    try {
+      await onUpdateStart(nextStartTime);
+      setIsEditingStart(false);
+    } catch {
+      setEditError('保存失败，请稍后重试');
+    } finally {
+      setIsSaving(false);
+    }
+  }, [onUpdateStart, startTimeValue]);
+
+  const handleCancelEdit = useCallback(() => {
+    if (parking) {
+      setStartTimeValue(formatDateTimeInput(parking.startTime));
+    }
+    setEditError('');
+    setIsEditingStart(false);
+  }, [parking]);
+
   if (!parking) {
     return (
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="relative">
@@ -114,7 +166,7 @@ function ActiveParking({ parking, onStart, onEnd }: ActiveParkingProps) {
           />
         </div>
 
-        <CardHeader className="pb-4">
+        <CardHeader className="pb-2">
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-3 text-lg text-white font-medium">
               <span className="relative flex h-2.5 w-2.5">
@@ -127,17 +179,88 @@ function ActiveParking({ parking, onStart, onEnd }: ActiveParkingProps) {
               </span>
               停车中
             </CardTitle>
-            <div className="flex items-center gap-2 text-white/40 text-sm">
-              <Calendar weight="bold" className="w-4 h-4" />
-              <span>{formatDateTime(parking.startTime)}</span>
-            </div>
           </div>
         </CardHeader>
-        <CardContent className="space-y-8">
+        <CardContent className="space-y-6">
           <div className="text-center py-4">
             <p className="text-white/30 text-sm mb-3 uppercase tracking-wider">已停时长</p>
             <TimerDisplay parking={parking} />
           </div>
+
+          <div className="rounded-2xl bg-white/[0.025] border border-white/[0.06] p-4">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="flex items-center gap-2 text-xs text-white/35 mb-1.5">
+                  <Calendar weight="bold" className="w-3.5 h-3.5" />
+                  停车开始时间
+                </p>
+                {!isEditingStart && (
+                  <p className="text-sm font-medium text-white/80 tabular-nums">
+                    {formatDateTime(parking.startTime)}
+                  </p>
+                )}
+              </div>
+              {!isEditingStart && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setIsEditingStart(true)}
+                  className="h-8 shrink-0 rounded-lg px-2.5 text-xs text-amber-300/80 hover:text-amber-200 hover:bg-amber-500/10"
+                >
+                  <PencilSimple weight="bold" className="w-3.5 h-3.5 mr-1.5" />
+                  修改
+                </Button>
+              )}
+            </div>
+
+            <AnimatePresence initial={false}>
+              {isEditingStart && (
+                <motion.div
+                  initial={{ opacity: 0, y: -6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -6 }}
+                  className="mt-3"
+                >
+                  <input
+                    type="datetime-local"
+                    value={startTimeValue}
+                    max={formatDateTimeInput(new Date())}
+                    onChange={(event) => {
+                      setStartTimeValue(event.target.value);
+                      setEditError('');
+                    }}
+                    aria-label="停车开始时间"
+                    aria-invalid={Boolean(editError)}
+                    className="h-11 w-full rounded-xl border border-white/[0.08] bg-white/[0.04] px-3 text-sm text-white outline-none transition-colors focus:border-amber-400/50"
+                  />
+                  {editError && <p className="mt-2 text-xs text-red-400">{editError}</p>}
+                  <div className="mt-3 grid grid-cols-2 gap-2">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      onClick={handleCancelEdit}
+                      disabled={isSaving}
+                      className="h-10 rounded-xl text-white/50 hover:text-white hover:bg-white/[0.05]"
+                    >
+                      <X weight="bold" className="w-4 h-4 mr-1.5" />
+                      取消
+                    </Button>
+                    <Button
+                      type="button"
+                      onClick={handleSaveStartTime}
+                      disabled={isSaving}
+                      className="h-10 rounded-xl bg-amber-500 text-[#0a0a0b] hover:bg-amber-400"
+                    >
+                      <Check weight="bold" className="w-4 h-4 mr-1.5" />
+                      {isSaving ? '保存中' : '保存并重算'}
+                    </Button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
           <Button
             size="lg"
             variant="outline"
@@ -304,6 +427,12 @@ export default function ParkingPage() {
     await loadData();
   }, [loadData]);
 
+  const handleUpdateStart = useCallback(async (startTime: Date) => {
+    if (!activeParking?.id) return;
+    await updateParkingStartTime(activeParking.id, startTime);
+    await loadData();
+  }, [activeParking, loadData]);
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[#0a0a0b] relative">
@@ -351,7 +480,12 @@ export default function ParkingPage() {
 
         {/* Main Content */}
         <div className="flex-1 space-y-6">
-          <ActiveParking parking={activeParking} onStart={handleStart} onEnd={handleEnd} />
+          <ActiveParking
+            parking={activeParking}
+            onStart={handleStart}
+            onEnd={handleEnd}
+            onUpdateStart={handleUpdateStart}
+          />
 
           <ParkingHistory
             history={history}
