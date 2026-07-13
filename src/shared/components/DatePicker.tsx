@@ -486,7 +486,7 @@ export default function DatePicker({
           type="button"
           onClick={() => handleYearSelect(y)}
           className={cn(
-            'py-3 rounded-xl text-sm font-medium transition-all duration-150',
+            'py-3 rounded-xl text-sm font-medium transition-[color,background-color] duration-150',
             y === year
               ? accent.selected
               : cn('text-white/70 hover:text-white', accent.hover)
@@ -510,7 +510,7 @@ export default function DatePicker({
               type="button"
               onClick={() => handleMonthSelect(idx)}
               className={cn(
-                'py-3 rounded-xl text-sm font-medium transition-all duration-150',
+                'py-3 rounded-xl text-sm font-medium transition-[color,background-color] duration-150',
                 idx === lunarMonthIndex
                   ? accent.selected
                   : cn('text-white/70 hover:text-white', accent.hover)
@@ -532,7 +532,7 @@ export default function DatePicker({
             type="button"
             onClick={() => handleMonthSelect(idx)}
             className={cn(
-              'py-3 rounded-xl text-sm font-medium transition-all duration-150',
+              'py-3 rounded-xl text-sm font-medium transition-[color,background-color] duration-150',
               idx === month
                 ? accent.selected
                 : cn('text-white/70 hover:text-white', accent.hover)
@@ -572,7 +572,7 @@ export default function DatePicker({
                 onClick={() => handleDateSelect(day)}
                 className={cn(
                   'w-full h-full rounded-lg text-sm font-medium',
-                  'transition-all duration-150',
+                  'transition-[color,background-color] duration-150',
                   isSelected(day)
                     ? accent.selected
                     : cn(
@@ -627,7 +627,7 @@ export default function DatePicker({
           'h-11 px-4 rounded-xl',
           'bg-white/[0.03] border border-white/[0.08]',
           'text-white placeholder:text-white/25',
-          'transition-all duration-200',
+          'transition-[color,background-color] duration-200',
           'hover:border-white/[0.12]',
           'focus:border-blue-500/50 focus:ring-blue-500/10 focus:ring-1 focus:outline-none',
           isOpen && 'border-white/[0.15]'
@@ -652,7 +652,7 @@ export default function DatePicker({
               e.stopPropagation();
               clearDate();
             }}
-            className="p-1 rounded-md text-white/30 hover:text-white/60 hover:bg-white/[0.05] transition-all duration-150"
+            className="p-1 rounded-md text-white/30 hover:text-white/60 hover:bg-white/[0.05] transition-[color,background-color] duration-150"
           >
             <X weight="bold" className="w-3.5 h-3.5" />
           </button>
@@ -674,14 +674,14 @@ export default function DatePicker({
               'bg-[#1a1a1c] border border-white/[0.08]',
               'shadow-2xl shadow-black/40'
             )}
-            style={{ willChange: 'transform, opacity' }}
+            style={{ willChange: 'transform, opacity', transformOrigin: 'top' }}
           >
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
               <button
                 type="button"
                 onClick={handleHeaderPrev}
-                className="p-1.5 rounded-lg text-white/40 hover:text-white hover:bg-white/[0.05] transition-all duration-150"
+                className="p-1.5 rounded-lg text-white/40 hover:text-white hover:bg-white/[0.05] transition-[color,background-color] duration-150"
               >
                 <CaretLeft weight="bold" className="w-4 h-4" />
               </button>
@@ -691,7 +691,7 @@ export default function DatePicker({
                   type="button"
                   onClick={() => setViewMode(viewMode === 'year' ? 'day' : 'year')}
                   className={cn(
-                    'px-2 py-1 rounded-md text-sm font-medium transition-all duration-150',
+                    'px-2 py-1 rounded-md text-sm font-medium transition-[color,background-color] duration-150',
                     viewMode === 'year'
                       ? accent.active
                       : 'text-white hover:bg-white/[0.05]'
@@ -705,7 +705,7 @@ export default function DatePicker({
                     type="button"
                     onClick={() => setViewMode(viewMode === 'month' ? 'day' : 'month')}
                     className={cn(
-                      'px-2 py-1 rounded-md text-sm font-medium transition-all duration-150',
+                      'px-2 py-1 rounded-md text-sm font-medium transition-[color,background-color] duration-150',
                       viewMode === 'month'
                         ? accent.active
                         : 'text-white hover:bg-white/[0.05]'
@@ -718,7 +718,7 @@ export default function DatePicker({
               <button
                 type="button"
                 onClick={handleHeaderNext}
-                className="p-1.5 rounded-lg text-white/40 hover:text-white hover:bg-white/[0.05] transition-all duration-150"
+                className="p-1.5 rounded-lg text-white/40 hover:text-white hover:bg-white/[0.05] transition-[color,background-color] duration-150"
               >
                 <CaretRight weight="bold" className="w-4 h-4" />
               </button>
@@ -732,6 +732,7 @@ export default function DatePicker({
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.98 }}
                 transition={{ duration: 0.15 }}
+                style={{ transformOrigin: 'top' }}
               >
                 {viewMode === 'year' && renderYearView()}
                 {viewMode === 'month' && renderMonthView()}
@@ -747,7 +748,7 @@ export default function DatePicker({
                   onClick={handleToday}
                   className={cn(
                     'flex-1 py-2 px-3 rounded-lg text-xs font-medium',
-                    'transition-all duration-150',
+                    'transition-[color,background-color] duration-150',
                     'bg-white/[0.03] hover:bg-white/[0.06]',
                     accent.button
                   )}
@@ -759,7 +760,7 @@ export default function DatePicker({
                   onClick={handleTomorrow}
                   className={cn(
                     'flex-1 py-2 px-3 rounded-lg text-xs font-medium',
-                    'transition-all duration-150',
+                    'transition-[color,background-color] duration-150',
                     'bg-white/[0.03] hover:bg-white/[0.06]',
                     accent.button
                   )}
@@ -771,7 +772,7 @@ export default function DatePicker({
                   onClick={handleNextWeek}
                   className={cn(
                     'flex-1 py-2 px-3 rounded-lg text-xs font-medium',
-                    'transition-all duration-150',
+                    'transition-[color,background-color] duration-150',
                     'bg-white/[0.03] hover:bg-white/[0.06]',
                     accent.button
                   )}

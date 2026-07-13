@@ -185,7 +185,7 @@ export default function DataTransferDialog({ isOpen, onClose }: DataTransferDial
         {/* Close button */}
         <button
           onClick={handleClose}
-          className="absolute top-4 right-4 p-2 rounded-xl text-white/40 hover:text-white hover:bg-white/[0.05] transition-all"
+          className="absolute top-4 right-4 p-2 rounded-xl text-white/40 hover:text-white hover:bg-white/[0.05] transition-[color,background-color,border-color] duration-150"
         >
           <X weight="bold" className="w-5 h-5" />
         </button>
@@ -238,7 +238,7 @@ export default function DataTransferDialog({ isOpen, onClose }: DataTransferDial
             <Button
               onClick={handleExport}
               disabled={isExporting}
-              className="w-full bg-blue-500 hover:bg-blue-400 text-white rounded-xl py-5 font-medium transition-all disabled:opacity-50"
+              className="w-full bg-blue-500 hover:bg-blue-400 text-white rounded-xl py-5 font-medium transition-[color,background-color,border-color] duration-150 disabled:opacity-50"
             >
               {isExporting ? (
                 <>
@@ -270,7 +270,7 @@ export default function DataTransferDialog({ isOpen, onClose }: DataTransferDial
               <>
                 <label
                   htmlFor="file-input"
-                  className={`block p-6 rounded-2xl border-2 border-dashed cursor-pointer transition-all ${
+                  className={`block p-6 rounded-2xl border-2 border-dashed cursor-pointer transition-[color,background-color,border-color] duration-150 ${
                     selectedFile
                       ? 'bg-blue-500/10 border-blue-500/30'
                       : 'bg-white/[0.03] border-white/[0.08] hover:border-white/[0.15]'
@@ -324,7 +324,7 @@ export default function DataTransferDialog({ isOpen, onClose }: DataTransferDial
                 <Button
                   onClick={handleImport}
                   disabled={!selectedFile || isImporting}
-                  className="w-full bg-blue-500 hover:bg-blue-400 text-white rounded-xl py-5 font-medium transition-all disabled:opacity-50"
+                  className="w-full bg-blue-500 hover:bg-blue-400 text-white rounded-xl py-5 font-medium transition-[color,background-color,border-color] duration-150 disabled:opacity-50"
                 >
                   {isImporting ? (
                     <>
@@ -389,7 +389,7 @@ export default function DataTransferDialog({ isOpen, onClose }: DataTransferDial
 
                 <Button
                   onClick={handleClose}
-                  className="w-full bg-blue-500 hover:bg-blue-400 text-white rounded-xl py-5 font-medium transition-all"
+                  className="w-full bg-blue-500 hover:bg-blue-400 text-white rounded-xl py-5 font-medium transition-[color,background-color,border-color] duration-150"
                 >
                   完成
                 </Button>

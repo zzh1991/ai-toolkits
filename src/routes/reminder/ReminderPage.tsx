@@ -102,7 +102,7 @@ export default function ReminderPage() {
           </div>
           <Button
             onClick={handleAdd}
-            className="bg-blue-500 hover:bg-blue-400 text-white rounded-full px-4 sm:px-5 py-5 text-sm font-medium whitespace-nowrap transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
+            className="bg-blue-500 hover:bg-blue-400 text-white rounded-full px-4 sm:px-5 py-5 text-sm font-medium whitespace-nowrap transition-[background-color,transform] duration-300 hover:scale-[1.02] active:scale-[0.98]"
           >
             <Plus weight="bold" className="w-4 h-4 sm:mr-2" />
             <span className="hidden sm:inline">新增</span>
@@ -157,7 +157,7 @@ export default function ReminderPage() {
               <p className="text-white/40 text-sm mb-8">点击右上角按钮添加你的第一个纪念日</p>
               <Button
                 onClick={handleAdd}
-                className="bg-blue-500 hover:bg-blue-400 text-white rounded-full px-6 py-5 text-sm font-medium transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
+                className="bg-blue-500 hover:bg-blue-400 text-white rounded-full px-6 py-5 text-sm font-medium transition-[background-color,transform] duration-300 hover:scale-[1.02] active:scale-[0.98]"
               >
                 <Plus weight="bold" className="w-4 h-4 mr-2" />
                 添加纪念日

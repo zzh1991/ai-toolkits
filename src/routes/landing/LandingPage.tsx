@@ -83,7 +83,7 @@ function ToolCard({ tool, index }: ToolCardProps) {
     >
       <Link
         to={tool.to}
-        className="group relative flex min-h-40 h-full flex-col justify-between overflow-hidden rounded-[1.4rem] bg-[#141416] p-4 sm:min-h-52 sm:p-6 border border-white/[0.06] transition-all duration-300 hover:-translate-y-1 hover:border-white/[0.12] active:translate-y-0 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/60"
+        className="group relative flex min-h-40 h-full flex-col justify-between overflow-hidden rounded-[1.4rem] bg-[#141416] p-4 sm:min-h-52 sm:p-6 border border-white/[0.06] transition-[transform,border-color,box-shadow] duration-300 hover:-translate-y-1 hover:border-white/[0.12] active:translate-y-0 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/60"
       >
         <div
           className={`absolute -right-10 -top-12 h-32 w-32 rounded-full bg-transparent blur-3xl transition-colors duration-500 ${tool.glowClass}`}
@@ -95,7 +95,7 @@ function ToolCard({ tool, index }: ToolCardProps) {
           </div>
           <ArrowUpRight
             weight="bold"
-            className="h-4 w-4 text-white/20 transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-white/70"
+            className="h-4 w-4 text-white/20 transition-[transform,border-color,box-shadow] duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-white/70"
           />
         </div>
 
@@ -152,7 +152,7 @@ export default function LandingPage() {
               type="button"
               onClick={() => setIsDataDialogOpen(true)}
               aria-label="打开数据管理"
-              className="flex h-9 w-9 items-center justify-center rounded-xl text-white/45 transition-all duration-200 hover:bg-white/[0.05] hover:text-white active:scale-95"
+              className="flex h-9 w-9 items-center justify-center rounded-xl text-white/45 transition-[color,background-color,transform] duration-200 hover:bg-white/[0.05] hover:text-white active:scale-95"
             >
               <Database weight="bold" className="h-4 w-4" />
             </button>

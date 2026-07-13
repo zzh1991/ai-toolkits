@@ -3,6 +3,7 @@ import { memo, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { PencilSimple, Trash } from '@phosphor-icons/react';
 import { cn, formatDateDisplay } from '@/shared/lib/utils';
+import { useMotionTransition, motionTransitions } from '@/shared/lib/motion';
 import type { ReminderCardProps } from '@/modules/reminder/types/reminder';
 import { CARD_THEMES } from '@/shared/constants/colors';
 
@@ -56,14 +57,17 @@ export default memo(function ReminderCard({ reminder, onEdit, onDelete }: Remind
     };
   }, []);
 
+  const transition = useMotionTransition(motionTransitions.entrance);
+
   return (
     <motion.div
+      layout
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -8, transition: { duration: 0.15 } }}
       transition={{
-        duration: 0.35,
-        ease: [0.16, 1, 0.3, 1],
+        ...transition,
+        layout: { type: 'spring', stiffness: 500, damping: 50 },
       }}
       style={{
         willChange: 'transform, opacity',
@@ -72,7 +76,7 @@ export default memo(function ReminderCard({ reminder, onEdit, onDelete }: Remind
       className={cn(
         't-tilt group relative overflow-hidden rounded-2xl sm:rounded-3xl',
         'bg-[#141416] border border-white/[0.06]',
-        'transition-all duration-300',
+        'transition-[border-color,box-shadow] duration-300',
         'hover:border-white/[0.12] hover:shadow-lg hover:shadow-black/20'
       )}
     >
@@ -138,7 +142,7 @@ export default memo(function ReminderCard({ reminder, onEdit, onDelete }: Remind
             <button
               onClick={onEdit}
               className={cn(
-                'p-2 sm:p-2.5 rounded-xl transition-all duration-200',
+                'p-2 sm:p-2.5 rounded-xl transition-[color,background-color] duration-200',
                 'bg-white/[0.05] hover:bg-white/10 text-white/50 hover:text-white',
                 'transform hover:scale-105 active:scale-95'
               )}
@@ -150,7 +154,7 @@ export default memo(function ReminderCard({ reminder, onEdit, onDelete }: Remind
             <button
               onClick={onDelete}
               className={cn(
-                'p-2 sm:p-2.5 rounded-xl transition-all duration-200',
+                'p-2 sm:p-2.5 rounded-xl transition-[color,background-color] duration-200',
                 'bg-white/[0.05] hover:bg-red-500/20 text-white/50 hover:text-red-400',
                 'transform hover:scale-105 active:scale-95'
               )}

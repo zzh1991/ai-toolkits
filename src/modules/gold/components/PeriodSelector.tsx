@@ -22,7 +22,7 @@ export default memo(function PeriodSelector({ period, onChange }: PeriodSelector
           key={value}
           onClick={() => onChange(value)}
           className={cn(
-            'px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200',
+            'px-4 py-2 rounded-lg text-sm font-medium transition-[color,background-color] duration-200',
             period === value
               ? 'bg-gradient-to-r from-amber-500/20 to-yellow-500/20 text-amber-300 border border-amber-500/20'
               : 'text-white/50 hover:text-white/80 hover:bg-white/[0.04]'

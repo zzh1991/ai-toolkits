@@ -141,7 +141,7 @@ export default function KanbanBoard() {
           </div>
           <Button
             onClick={() => handleAdd('important-urgent')}
-            className="bg-emerald-500 hover:bg-emerald-400 text-[#0a0a0b] rounded-full px-4 sm:px-5 py-5 text-sm font-medium whitespace-nowrap transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
+            className="bg-emerald-500 hover:bg-emerald-400 text-[#0a0a0b] rounded-full px-4 sm:px-5 py-5 text-sm font-medium whitespace-nowrap transition-[background-color,transform] duration-300 hover:scale-[1.02] active:scale-[0.98]"
           >
             <Plus weight="bold" className="w-4 h-4 sm:mr-2" />
             <span className="hidden sm:inline">新建任务</span>

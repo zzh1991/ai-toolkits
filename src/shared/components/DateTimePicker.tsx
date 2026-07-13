@@ -265,7 +265,7 @@ export default function DateTimePicker({
           'h-11 px-4 rounded-xl',
           'bg-white/[0.03] border border-white/[0.08]',
           'text-white placeholder:text-white/25',
-          'transition-all duration-200',
+          'transition-[color,background-color] duration-200',
           'hover:border-white/[0.12]',
           'focus:border-emerald-500/50 focus:ring-emerald-500/10 focus:ring-1 focus:outline-none',
           isOpen && 'border-white/[0.15]'
@@ -290,7 +290,7 @@ export default function DateTimePicker({
               e.stopPropagation();
               clearDateTime();
             }}
-            className="p-1 rounded-md text-white/30 hover:text-white/60 hover:bg-white/[0.05] transition-all duration-150"
+            className="p-1 rounded-md text-white/30 hover:text-white/60 hover:bg-white/[0.05] transition-[color,background-color] duration-150"
           >
             <X weight="bold" className="w-3.5 h-3.5" />
           </button>
@@ -304,7 +304,7 @@ export default function DateTimePicker({
             initial={{ opacity: 0, y: -8, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -8, scale: 0.96 }}
-            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
             className={cn(
               'fixed inset-x-4 top-auto mt-2 z-[100]',
               'sm:absolute sm:inset-x-auto sm:top-full sm:left-0 sm:w-[360px]',
@@ -312,7 +312,7 @@ export default function DateTimePicker({
               'bg-[#1a1a1c] border border-white/[0.08]',
               'shadow-2xl shadow-black/40'
             )}
-            style={{ willChange: 'transform, opacity' }}
+            style={{ willChange: 'transform, opacity', transformOrigin: 'top' }}
           >
             {/* Tabs */}
             <div className="flex border-b border-white/[0.06]">
@@ -321,7 +321,7 @@ export default function DateTimePicker({
                 onClick={() => setActiveTab('date')}
                 className={cn(
                   'flex-1 flex items-center justify-center gap-2 py-3 text-sm font-medium',
-                  'transition-all duration-200',
+                  'transition-[color,background-color] duration-200',
                   activeTab === 'date'
                     ? cn(accent.tabActive)
                     : 'text-white/50 hover:text-white/70 hover:bg-white/[0.03]'
@@ -335,7 +335,7 @@ export default function DateTimePicker({
                 onClick={() => setActiveTab('time')}
                 className={cn(
                   'flex-1 flex items-center justify-center gap-2 py-3 text-sm font-medium',
-                  'transition-all duration-200',
+                  'transition-[color,background-color] duration-200',
                   activeTab === 'time'
                     ? cn(accent.tabActive)
                     : 'text-white/50 hover:text-white/70 hover:bg-white/[0.03]'
@@ -355,7 +355,7 @@ export default function DateTimePicker({
                     <button
                       type="button"
                       onClick={handlePrevMonth}
-                      className="p-1.5 rounded-lg text-white/40 hover:text-white hover:bg-white/[0.05] transition-all duration-150"
+                      className="p-1.5 rounded-lg text-white/40 hover:text-white hover:bg-white/[0.05] transition-[color,background-color] duration-150"
                     >
                       <CaretLeft weight="bold" className="w-4 h-4" />
                     </button>
@@ -365,7 +365,7 @@ export default function DateTimePicker({
                     <button
                       type="button"
                       onClick={handleNextMonth}
-                      className="p-1.5 rounded-lg text-white/40 hover:text-white hover:bg-white/[0.05] transition-all duration-150"
+                      className="p-1.5 rounded-lg text-white/40 hover:text-white hover:bg-white/[0.05] transition-[color,background-color] duration-150"
                     >
                       <CaretRight weight="bold" className="w-4 h-4" />
                     </button>
@@ -393,7 +393,7 @@ export default function DateTimePicker({
                             onClick={() => handleDateSelect(day)}
                             className={cn(
                               'w-full h-full rounded-lg text-sm font-medium',
-                              'transition-all duration-150',
+                              'transition-[color,background-color] duration-150',
                               isSelected(day)
                                 ? accent.selected
                                 : cn(
@@ -417,7 +417,7 @@ export default function DateTimePicker({
                       onClick={handleToday}
                       className={cn(
                         'flex-1 py-2 px-3 rounded-lg text-xs font-medium',
-                        'transition-all duration-150',
+                        'transition-[color,background-color] duration-150',
                         'bg-white/[0.03] hover:bg-white/[0.06]',
                         accent.button
                       )}
@@ -429,7 +429,7 @@ export default function DateTimePicker({
                       onClick={handleTomorrow}
                       className={cn(
                         'flex-1 py-2 px-3 rounded-lg text-xs font-medium',
-                        'transition-all duration-150',
+                        'transition-[color,background-color] duration-150',
                         'bg-white/[0.03] hover:bg-white/[0.06]',
                         accent.button
                       )}
@@ -462,7 +462,7 @@ export default function DateTimePicker({
                         onClick={() => handleTimeSelect(time)}
                         className={cn(
                           'py-2 px-1 rounded-lg text-xs font-medium',
-                          'transition-all duration-150',
+                          'transition-[color,background-color] duration-150',
                           selectedTime === time
                             ? accent.selected
                             : cn(
@@ -482,7 +482,7 @@ export default function DateTimePicker({
                     onClick={() => setActiveTab('date')}
                     className={cn(
                       'w-full mt-3 py-2.5 rounded-lg text-sm font-medium',
-                      'transition-all duration-150',
+                      'transition-[color,background-color] duration-150',
                       'bg-white/[0.03] hover:bg-white/[0.06]',
                       'text-white/70 hover:text-white'
                     )}

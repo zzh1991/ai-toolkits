@@ -2,7 +2,6 @@
 import { useState, useMemo, memo } from 'react';
 import { Plus, CaretDown, CaretUp } from '@phosphor-icons/react';
 import { Button } from '@/shared/components/ui/button';
-import { AnimatePresence, motion } from 'framer-motion';
 import TaskCard from './TaskCard';
 import type { Task, QuadrantType } from '@/db/schema';
 import { QUADRANT_LABELS } from '../types/task';
@@ -101,7 +100,7 @@ export default function QuadrantColumn({
 
   return (
     <div
-      className={`flex flex-col h-full rounded-2xl border border-white/[0.06] ${accent.bg} backdrop-blur-xl overflow-hidden transition-all duration-200 hover:border-white/[0.1]`}
+      className={`flex flex-col h-full rounded-2xl border border-white/[0.06] ${accent.bg} backdrop-blur-xl overflow-hidden transition-[border-color] duration-200 hover:border-white/[0.1]`}
     >
       {/* Header */}
       <div className="relative p-4">
@@ -183,32 +182,27 @@ export default function QuadrantColumn({
                   )}
                   已完成 ({completed.length})
                 </button>
-                <AnimatePresence initial={false}>
-                  {showCompleted && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
-                      exit={{ opacity: 0, height: 0 }}
-                      transition={{
-                        duration: 0.2,
-                        ease: [0.16, 1, 0.3, 1],
-                      }}
-                      style={{ willChange: 'height, opacity' }}
-                      className="space-y-2 mt-2 overflow-hidden"
-                    >
-                      {completed.map((task) => (
-                        <MemoizedTaskCard
-                          key={task.id}
-                          task={task}
-                          isCompleted={true}
-                          onToggleComplete={onToggleComplete}
-                          onEdit={onEdit}
-                          onDelete={onDelete}
-                        />
-                      ))}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                <div
+                  className="mt-2 overflow-hidden"
+                  style={{
+                    display: 'grid',
+                    gridTemplateRows: showCompleted ? '1fr' : '0fr',
+                    transition: 'grid-template-rows 250ms cubic-bezier(0.22, 1, 0.36, 1)',
+                  }}
+                >
+                  <div className="space-y-2 min-h-0 overflow-hidden">
+                    {completed.map((task) => (
+                      <MemoizedTaskCard
+                        key={task.id}
+                        task={task}
+                        isCompleted={true}
+                        onToggleComplete={onToggleComplete}
+                        onEdit={onEdit}
+                        onDelete={onDelete}
+                      />
+                    ))}
+                  </div>
+                </div>
               </div>
             )}
           </>

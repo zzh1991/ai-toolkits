@@ -3,6 +3,7 @@ import { memo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { SpeakerHigh, Sparkle } from '@phosphor-icons/react';
 import { cn } from '@/shared/lib/utils';
+import { useMotionTransition, motionTransitions } from '@/shared/lib/motion';
 import { CATEGORY_LABELS, LEVEL_LABELS } from '../data/vocabularyData';
 import type { VocabCategory, VocabLevel } from '../data/vocabularyData';
 
@@ -47,6 +48,10 @@ export default memo(function VocabCard({
   const [isPlaying, setIsPlaying] = useState(false);
   const synonymsList = synonyms ? synonyms.split(',').filter(Boolean) : [];
   const colorClass = CATEGORY_COLORS[category] || 'from-blue-500/20 to-indigo-500/20 border-blue-500/20';
+  const transition = useMotionTransition({
+    ...motionTransitions.entrance,
+    delay: Math.min(index * 0.03, 0.5),
+  });
 
   const handlePlay = () => {
     setIsPlaying(true);
@@ -58,17 +63,13 @@ export default memo(function VocabCard({
     <motion.div
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{
-        duration: 0.4,
-        ease: [0.16, 1, 0.3, 1],
-        delay: Math.min(index * 0.03, 0.5),
-      }}
+      transition={transition}
       style={{ willChange: 'transform, opacity' }}
       className={cn(
         'group relative overflow-hidden rounded-2xl',
         'bg-gradient-to-br border',
         colorClass,
-        'transition-all duration-300',
+        'transition-[transform,box-shadow] duration-300',
         'hover:scale-[1.01] hover:shadow-xl hover:shadow-black/20',
       )}
     >
@@ -87,7 +88,7 @@ export default memo(function VocabCard({
             className={cn(
               'flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center',
               'bg-white/10 border border-white/10',
-              'transition-all duration-200',
+              'transition-[background-color,border-color,transform] duration-200',
               'hover:bg-white/20 hover:border-white/20 hover:scale-105',
               'active:scale-95',
               isPlaying && 'bg-blue-500/30 border-blue-500/40 scale-95',

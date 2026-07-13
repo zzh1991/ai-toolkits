@@ -31,6 +31,7 @@ import {
   Check,
   X,
 } from '@phosphor-icons/react';
+import { cn } from '@/shared/lib/utils';
 
 interface ActiveParkingProps {
   parking: ParkingRecord | null;
@@ -122,155 +123,176 @@ function ActiveParking({ parking, onStart, onEnd, onUpdateStart }: ActiveParking
     setIsEditingStart(false);
   }, [parking]);
 
-  if (!parking) {
-    return (
-      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="relative">
-        <Card className="relative border border-white/[0.06] bg-[#141416] overflow-hidden">
-          <CardContent className="flex flex-col items-center justify-center py-16 sm:py-20">
-            <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-white/[0.03] border border-white/[0.06] flex items-center justify-center">
-              <Car weight="duotone" className="w-10 h-10 text-white/20" />
-            </div>
-            <p className="mb-8 text-white/40 text-lg">当前没有停车记录</p>
-            <Button
-              size="lg"
-              onClick={onStart}
-              className="bg-amber-500 hover:bg-amber-400 text-[#0a0a0b] border-0 rounded-full px-6 py-5 text-sm font-medium transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
-            >
-              <Play weight="fill" className="w-5 h-5 mr-2" />
-              开始停车
-            </Button>
-          </CardContent>
-        </Card>
-      </motion.div>
-    );
-  }
-
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.98 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+      layout
+      layoutId="parking-card"
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
       className="relative"
     >
-      {/* Glow effect */}
-      <div className="absolute -top-20 -right-20 w-40 h-40 bg-amber-500/10 rounded-full blur-3xl" />
-      <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-orange-500/10 rounded-full blur-3xl" />
+      {parking && (
+        <>
+          <div className="absolute -top-20 -right-20 w-40 h-40 bg-amber-500/10 rounded-full blur-3xl" />
+          <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-orange-500/10 rounded-full blur-3xl" />
+        </>
+      )}
 
-      <Card className="relative border border-amber-500/20 bg-[#141416] overflow-hidden">
-        {/* Active indicator */}
-        <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-500">
-          <motion.div
-            className="h-full bg-white/30"
-            animate={{ opacity: [0.3, 0.6, 0.3] }}
-            transition={{ duration: 2, repeat: Infinity }}
-          />
-        </div>
-
-        <CardHeader className="pb-2">
-          <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-3 text-lg text-white font-medium">
-              <span className="relative flex h-2.5 w-2.5">
-                <motion.span
-                  className="absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-60"
-                  animate={{ scale: [1, 1.5, 1], opacity: [0.6, 0, 0.6] }}
+      <Card className={cn(
+        'relative overflow-hidden',
+        parking
+          ? 'border-amber-500/20 bg-[#141416]'
+          : 'border border-white/[0.06] bg-[#141416]'
+      )}>
+        <AnimatePresence mode="wait">
+          {!parking ? (
+            <motion.div
+              key="empty"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.15 }}
+            >
+              <CardContent className="flex flex-col items-center justify-center py-16 sm:py-20">
+                <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-white/[0.03] border border-white/[0.06] flex items-center justify-center">
+                  <Car weight="duotone" className="w-10 h-10 text-white/20" />
+                </div>
+                <p className="mb-8 text-white/40 text-lg">当前没有停车记录</p>
+                <Button
+                  size="lg"
+                  onClick={onStart}
+                  className="bg-amber-500 hover:bg-amber-400 text-[#0a0a0b] border-0 rounded-full px-6 py-5 text-sm font-medium transition-[background-color,transform] duration-300 hover:scale-[1.02] active:scale-[0.98]"
+                >
+                  <Play weight="fill" className="w-5 h-5 mr-2" />
+                  开始停车
+                </Button>
+              </CardContent>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="active"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.15 }}
+            >
+              <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-500">
+                <motion.div
+                  className="h-full bg-white/30"
+                  animate={{ opacity: [0.3, 0.6, 0.3] }}
                   transition={{ duration: 2, repeat: Infinity }}
                 />
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500" />
-              </span>
-              停车中
-            </CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="text-center py-4">
-            <p className="text-white/30 text-sm mb-3 uppercase tracking-wider">已停时长</p>
-            <TimerDisplay parking={parking} />
-          </div>
-
-          <div className="rounded-2xl bg-white/[0.025] border border-white/[0.06] p-4">
-            <div className="flex items-start justify-between gap-3">
-              <div className="min-w-0">
-                <p className="flex items-center gap-2 text-xs text-white/35 mb-1.5">
-                  <Calendar weight="bold" className="w-3.5 h-3.5" />
-                  停车开始时间
-                </p>
-                {!isEditingStart && (
-                  <p className="text-sm font-medium text-white/80 tabular-nums">
-                    {formatDateTime(parking.startTime)}
-                  </p>
-                )}
               </div>
-              {!isEditingStart && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setIsEditingStart(true)}
-                  className="h-8 shrink-0 rounded-lg px-2.5 text-xs text-amber-300/80 hover:text-amber-200 hover:bg-amber-500/10"
-                >
-                  <PencilSimple weight="bold" className="w-3.5 h-3.5 mr-1.5" />
-                  修改
-                </Button>
-              )}
-            </div>
 
-            <AnimatePresence initial={false}>
-              {isEditingStart && (
-                <motion.div
-                  initial={{ opacity: 0, y: -6 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -6 }}
-                  className="mt-3"
-                >
-                  <input
-                    type="datetime-local"
-                    value={startTimeValue}
-                    max={formatDateTimeInput(new Date())}
-                    onChange={(event) => {
-                      setStartTimeValue(event.target.value);
-                      setEditError('');
-                    }}
-                    aria-label="停车开始时间"
-                    aria-invalid={Boolean(editError)}
-                    className="h-11 w-full rounded-xl border border-white/[0.08] bg-white/[0.04] px-3 text-sm text-white outline-none transition-colors focus:border-amber-400/50"
-                  />
-                  {editError && <p className="mt-2 text-xs text-red-400">{editError}</p>}
-                  <div className="mt-3 grid grid-cols-2 gap-2">
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      onClick={handleCancelEdit}
-                      disabled={isSaving}
-                      className="h-10 rounded-xl text-white/50 hover:text-white hover:bg-white/[0.05]"
-                    >
-                      <X weight="bold" className="w-4 h-4 mr-1.5" />
-                      取消
-                    </Button>
-                    <Button
-                      type="button"
-                      onClick={handleSaveStartTime}
-                      disabled={isSaving}
-                      className="h-10 rounded-xl bg-amber-500 text-[#0a0a0b] hover:bg-amber-400"
-                    >
-                      <Check weight="bold" className="w-4 h-4 mr-1.5" />
-                      {isSaving ? '保存中' : '保存并重算'}
-                    </Button>
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center gap-3 text-lg text-white font-medium">
+                    <span className="relative flex h-2.5 w-2.5">
+                      <motion.span
+                        className="absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-60"
+                        animate={{ scale: [1, 1.5, 1], opacity: [0.6, 0, 0.6] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                      />
+                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500" />
+                    </span>
+                    停车中
+                  </CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="text-center py-4">
+                  <p className="text-white/30 text-sm mb-3 uppercase tracking-wider">已停时长</p>
+                  <TimerDisplay parking={parking} />
+                </div>
+
+                <div className="rounded-2xl bg-white/[0.025] border border-white/[0.06] p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="flex items-center gap-2 text-xs text-white/35 mb-1.5">
+                        <Calendar weight="bold" className="w-3.5 h-3.5" />
+                        停车开始时间
+                      </p>
+                      {!isEditingStart && (
+                        <p className="text-sm font-medium text-white/80 tabular-nums">
+                          {formatDateTime(parking.startTime)}
+                        </p>
+                      )}
+                    </div>
+                    {!isEditingStart && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setIsEditingStart(true)}
+                        className="h-8 shrink-0 rounded-lg px-2.5 text-xs text-amber-300/80 hover:text-amber-200 hover:bg-amber-500/10"
+                      >
+                        <PencilSimple weight="bold" className="w-3.5 h-3.5 mr-1.5" />
+                        修改
+                      </Button>
+                    )}
                   </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
 
-          <Button
-            size="lg"
-            variant="outline"
-            className="w-full rounded-xl py-6 text-sm font-medium bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 transition-all duration-300 hover:scale-[1.01]"
-            onClick={onEnd}
-          >
-            <Square weight="fill" className="w-5 h-5 mr-2" />
-            结束停车
-          </Button>
-        </CardContent>
+                  <AnimatePresence initial={false}>
+                    {isEditingStart && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -6 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -6 }}
+                        className="mt-3"
+                      >
+                        <input
+                          type="datetime-local"
+                          value={startTimeValue}
+                          max={formatDateTimeInput(new Date())}
+                          onChange={(event) => {
+                            setStartTimeValue(event.target.value);
+                            setEditError('');
+                          }}
+                          aria-label="停车开始时间"
+                          aria-invalid={Boolean(editError)}
+                          className="h-11 w-full rounded-xl border border-white/[0.08] bg-white/[0.04] px-3 text-sm text-white outline-none transition-colors focus:border-amber-400/50"
+                        />
+                        {editError && <p className="mt-2 text-xs text-red-400">{editError}</p>}
+                        <div className="mt-3 grid grid-cols-2 gap-2">
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            onClick={handleCancelEdit}
+                            disabled={isSaving}
+                            className="h-10 rounded-xl text-white/50 hover:text-white hover:bg-white/[0.05]"
+                          >
+                            <X weight="bold" className="w-4 h-4 mr-1.5" />
+                            取消
+                          </Button>
+                          <Button
+                            type="button"
+                            onClick={handleSaveStartTime}
+                            disabled={isSaving}
+                            className="h-10 rounded-xl bg-amber-500 text-[#0a0a0b] hover:bg-amber-400"
+                          >
+                            <Check weight="bold" className="w-4 h-4 mr-1.5" />
+                            {isSaving ? '保存中' : '保存并重算'}
+                          </Button>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="w-full rounded-xl py-6 text-sm font-medium bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 transition-[background-color,transform] duration-300 hover:scale-[1.01]"
+                  onClick={onEnd}
+                >
+                  <Square weight="fill" className="w-5 h-5 mr-2" />
+                  结束停车
+                </Button>
+              </CardContent>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </Card>
     </motion.div>
   );
@@ -319,66 +341,66 @@ function ParkingHistory({ history, onClear, onDelete, expanded, onToggle }: Park
             </Button>
           </div>
         </CardHeader>
-        <AnimatePresence>
-          {expanded && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            >
-              <CardContent className="p-0">
-                <div className="divide-y divide-white/[0.04]">
-                  {history.map((record, index) => (
-                    <motion.div
-                      key={record.id}
-                      initial={{ opacity: 0, x: -12 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.03 }}
-                      className="flex items-center justify-between p-4 hover:bg-white/[0.02] transition-colors group"
-                    >
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 text-white/70">
-                          <Clock weight="bold" className="w-3.5 h-3.5 text-white/30" />
-                          <span className="font-medium text-sm">{formatDateTime(record.startTime)}</span>
-                        </div>
-                        {record.endTime && (
-                          <p className="text-xs text-white/30 mt-1 pl-6">
-                            结束于 {formatDateTime(record.endTime)}
-                          </p>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-4">
-                        <span className="text-sm font-medium tabular-nums whitespace-nowrap text-amber-400/80">
-                          {formatDuration(getParkingDuration(record))}
-                        </span>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 rounded-lg text-white/20 hover:text-red-400 hover:bg-red-500/10 opacity-0 group-hover:opacity-100 transition-all"
-                          onClick={() => onDelete(record.id!)}
-                        >
-                          <Trash weight="bold" className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-                <div className="p-4 border-t border-white/[0.04]">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full border-white/[0.08] text-white/40 hover:text-white hover:bg-white/[0.05] hover:border-white/[0.12] rounded-xl"
-                    onClick={onClear}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateRows: expanded ? '1fr' : '0fr',
+            transition: 'grid-template-rows 250ms cubic-bezier(0.22, 1, 0.36, 1)',
+          }}
+          className="overflow-hidden"
+        >
+          <div className="min-h-0 overflow-hidden">
+            <CardContent className="p-0">
+              <div className="divide-y divide-white/[0.04]">
+                {history.map((record, index) => (
+                  <motion.div
+                    key={record.id}
+                    initial={{ opacity: 0, x: -12 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.03 }}
+                    className="flex items-center justify-between p-4 hover:bg-white/[0.02] transition-colors group"
                   >
-                    <Trash weight="bold" className="w-4 h-4 mr-2" />
-                    清空历史记录
-                  </Button>
-                </div>
-              </CardContent>
-            </motion.div>
-          )}
-        </AnimatePresence>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 text-white/70">
+                        <Clock weight="bold" className="w-3.5 h-3.5 text-white/30" />
+                        <span className="font-medium text-sm">{formatDateTime(record.startTime)}</span>
+                      </div>
+                      {record.endTime && (
+                        <p className="text-xs text-white/30 mt-1 pl-6">
+                          结束于 {formatDateTime(record.endTime)}
+                        </p>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <span className="text-sm font-medium tabular-nums whitespace-nowrap text-amber-400/80">
+                        {formatDuration(getParkingDuration(record))}
+                      </span>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 rounded-lg text-white/20 hover:text-red-400 hover:bg-red-500/10 opacity-0 group-hover:opacity-100 transition-[color,background-color,opacity] duration-150"
+                        onClick={() => onDelete(record.id!)}
+                      >
+                        <Trash weight="bold" className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+              <div className="p-4 border-t border-white/[0.04]">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full border-white/[0.08] text-white/40 hover:text-white hover:bg-white/[0.05] hover:border-white/[0.12] rounded-xl"
+                  onClick={onClear}
+                >
+                  <Trash weight="bold" className="w-4 h-4 mr-2" />
+                  清空历史记录
+                </Button>
+              </div>
+            </CardContent>
+          </div>
+        </div>
       </Card>
     </motion.div>
   );

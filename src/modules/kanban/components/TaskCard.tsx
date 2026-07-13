@@ -12,8 +12,9 @@ import {
 } from '@phosphor-icons/react';
 import { Checkbox } from '@/shared/components/ui/checkbox';
 import { Button } from '@/shared/components/ui/button';
-import type { Task } from '@/db/schema';
 import { motion } from 'framer-motion';
+import { useMotionTransition, motionTransitions } from '@/shared/lib/motion';
+import type { Task } from '@/db/schema';
 
 interface TaskCardProps {
   task: Task;
@@ -53,18 +54,21 @@ export default memo(function TaskCard({
   };
 
   const isOverdue = task.deadline && new Date(task.deadline) < new Date() && !task.isCompleted;
+  const transition = useMotionTransition(motionTransitions.entrance);
 
   return (
     <motion.div
+      layout
+      layoutId={`task-${task.id}`}
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -6, transition: { duration: 0.15 } }}
       transition={{
-        duration: 0.25,
-        ease: [0.16, 1, 0.3, 1],
+        ...transition,
+        layout: { type: 'spring', stiffness: 500, damping: 50 },
       }}
       style={{ willChange: 'transform, opacity' }}
-      className={`group relative rounded-xl border transition-all duration-200 ${
+      className={`group relative rounded-xl border transition-[border-color,background-color] duration-200 ${
         isCompleted
           ? 'bg-white/[0.02] border-white/[0.04] opacity-50'
           : 'bg-[#1a1a1c] border-white/[0.06] hover:border-white/[0.1]'
@@ -90,7 +94,7 @@ export default memo(function TaskCard({
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-7 w-7 rounded-lg text-white/30 hover:text-white hover:bg-white/[0.05] transition-all duration-150 active:scale-95"
+                  className="h-7 w-7 rounded-lg text-white/30 hover:text-white hover:bg-white/[0.05] transition-[color,background-color,transform] duration-150 active:scale-95"
                   style={{ willChange: 'transform' }}
                   onClick={handleEdit}
                 >
@@ -99,7 +103,7 @@ export default memo(function TaskCard({
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-7 w-7 rounded-lg text-white/30 hover:text-red-400 hover:bg-red-500/10 transition-all duration-150 active:scale-95"
+                  className="h-7 w-7 rounded-lg text-white/30 hover:text-red-400 hover:bg-red-500/10 transition-[color,background-color,transform] duration-150 active:scale-95"
                   style={{ willChange: 'transform' }}
                   onClick={handleDelete}
                 >

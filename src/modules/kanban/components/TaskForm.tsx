@@ -115,7 +115,7 @@ export default function TaskForm({
       >
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 rounded-xl text-white/40 hover:text-white hover:bg-white/[0.05] transition-all duration-200"
+          className="absolute top-4 right-4 p-2 rounded-xl text-white/40 hover:text-white hover:bg-white/[0.05] transition-[color,background-color,transform] duration-200"
         >
           <X weight="bold" className="w-5 h-5" />
         </button>
@@ -212,13 +212,13 @@ export default function TaskForm({
               type="button"
               variant="outline"
               onClick={onClose}
-              className="flex-1 bg-transparent border-white/[0.08] text-white/70 hover:text-white hover:bg-white/[0.05] h-11 rounded-xl transition-all duration-200"
+              className="flex-1 bg-transparent border-white/[0.08] text-white/70 hover:text-white hover:bg-white/[0.05] h-11 rounded-xl transition-[color,background-color,transform] duration-200"
             >
               取消
             </Button>
             <Button
               type="submit"
-              className="flex-1 bg-emerald-500 hover:bg-emerald-400 text-[#0a0a0b] border-0 h-11 rounded-xl font-medium transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+              className="flex-1 bg-emerald-500 hover:bg-emerald-400 text-[#0a0a0b] border-0 h-11 rounded-xl font-medium transition-[color,background-color,transform] duration-200 hover:scale-[1.02] active:scale-[0.98]"
             >
               {task ? '保存' : '创建'}
             </Button>

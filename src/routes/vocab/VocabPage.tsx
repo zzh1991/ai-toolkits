@@ -6,12 +6,7 @@ import { ArrowLeft, GraduationCap } from '@phosphor-icons/react';
 import VocabSearchBar from '@/modules/vocab/components/VocabSearchBar';
 import VocabList from '@/modules/vocab/components/VocabList';
 import { useVocabStore } from '@/modules/vocab/stores/vocabStore';
-
-const fadeInUp = {
-  initial: { opacity: 0, y: 16 },
-  animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] as const },
-};
+import { slideDown, fadeInUp } from '@/shared/lib/motion';
 
 export default function VocabPage() {
   const {
@@ -36,9 +31,7 @@ export default function VocabPage() {
     <div className="min-h-screen bg-[#0a0a0b] noise-overlay">
       {/* Navigation */}
       <motion.nav
-        initial={{ y: -20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+        {...slideDown}
         className="fixed top-0 left-0 right-0 z-50"
       >
         <div className="mx-4 mt-4">

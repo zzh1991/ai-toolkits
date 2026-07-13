@@ -84,7 +84,7 @@ export default function ReminderForm({ reminder, onSubmit, onCancel }: ReminderF
       >
         <button
           onClick={onCancel}
-          className="absolute top-4 right-4 p-2 rounded-xl text-white/40 hover:text-white hover:bg-white/[0.05] transition-all duration-200"
+          className="absolute top-4 right-4 p-2 rounded-xl text-white/40 hover:text-white hover:bg-white/[0.05] transition-[color,background-color,transform] duration-200"
         >
           <X weight="bold" className="w-5 h-5" />
         </button>
@@ -137,7 +137,7 @@ export default function ReminderForm({ reminder, onSubmit, onCancel }: ReminderF
                   type="button"
                   onClick={() => updateField('dateType', type)}
                   className={cn(
-                    'flex-1 py-3 rounded-xl text-sm font-medium transition-all duration-200',
+                    'flex-1 py-3 rounded-xl text-sm font-medium transition-[color,background-color,transform] duration-200',
                     formData.dateType === type
                       ? 'bg-blue-500 text-white'
                       : 'bg-white/[0.03] text-white/50 hover:bg-white/[0.06] hover:text-white/70'
@@ -198,7 +198,7 @@ export default function ReminderForm({ reminder, onSubmit, onCancel }: ReminderF
                   whileHover={{ scale: 1.08 }}
                   whileTap={{ scale: 0.95 }}
                   className={cn(
-                    'w-10 h-10 rounded-full transition-all duration-200',
+                    'w-10 h-10 rounded-full transition-[color,background-color,transform] duration-200',
                     formData.color === theme.name
                       ? 'ring-2 ring-white ring-offset-2 ring-offset-[#141416]'
                       : 'opacity-60 hover:opacity-100'
@@ -218,13 +218,13 @@ export default function ReminderForm({ reminder, onSubmit, onCancel }: ReminderF
               type="button"
               variant="outline"
               onClick={onCancel}
-              className="flex-1 bg-transparent border-white/[0.08] text-white/70 hover:text-white hover:bg-white/[0.05] h-11 rounded-xl transition-all duration-200"
+              className="flex-1 bg-transparent border-white/[0.08] text-white/70 hover:text-white hover:bg-white/[0.05] h-11 rounded-xl transition-[color,background-color,transform] duration-200"
             >
               取消
             </Button>
             <Button
               type="submit"
-              className="flex-1 bg-blue-500 hover:bg-blue-400 text-white border-0 h-11 rounded-xl transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+              className="flex-1 bg-blue-500 hover:bg-blue-400 text-white border-0 h-11 rounded-xl transition-[color,background-color,transform] duration-200 hover:scale-[1.02] active:scale-[0.98]"
             >
               {reminder ? '保存' : '添加'}
             </Button>

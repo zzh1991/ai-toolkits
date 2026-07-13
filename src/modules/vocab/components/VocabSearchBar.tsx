@@ -92,7 +92,7 @@ export default memo(function VocabSearchBar({
               onLevelChange('');
               onCategoryChange('');
             }}
-            className="h-10 px-4 rounded-xl text-sm text-white/50 hover:text-white/70 border border-white/[0.06] hover:border-white/[0.12] transition-all"
+            className="h-10 px-4 rounded-xl text-sm text-white/50 hover:text-white/70 border border-white/[0.06] hover:border-white/[0.12] transition-[color,border-color] duration-150"
           >
             清除筛选
           </button>
